@@ -1,0 +1,63 @@
+.flex-container, html, body {
+    height:100%;
+    margin:0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+div.flex-container {
+    display:flex;
+    flex-direction:row;
+}
+div.sidebar-container {
+    margin:1em;
+    padding:1em;
+    background-color: rgb(251,251,251);
+}
+
+.intro-text {
+    margin-top:1em;
+}
+
+div.flex-container > div.flex-columns {
+    display:flex;
+    background-color: rgb(245,245,245);     
+}
+
+.list-heading {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size:small; 
+}
+
+div.flex-column-left {
+    max-width:320px;
+    flex-grow:unset;
+}
+
+div.flex-column-right {
+    flex-grow:1;
+    flex-direction: column;
+    align-items:center; 
+    justify-content: center;
+}
+
+div.selectedbox {
+    width: 50px;
+    height: 50px;
+    color: #472085;
+    background-color: #7854AF; 
+}
+
+table#tblBrowsers td {
+    padding:0.5em; 
+    border:2px dotted rgb(245,245,245);
+}
+
+td.browser-logo-cell {
+    color:darkslategrey;
+    background-color:rgb(245,245,245);
+    
+}
