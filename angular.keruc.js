@@ -12,7 +12,6 @@ var f = function ($compile) {
             onDisallowedSelected: '&'
         },
         link: function (scope, element, attrs) {
-            var nodeLocations = [];
             var rows = null;
 
             scope.settings = {
@@ -177,7 +176,6 @@ var f = function ($compile) {
                 }
                 
                 o.beginElement();
-
             };
 
             var draw = function () {
