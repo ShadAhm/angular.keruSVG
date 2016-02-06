@@ -12,7 +12,7 @@ var f = function ($compile) {
             onDisallowedSelected: '&'
         },
         link: function (scope, element, attrs) {
-            var nodeLocations = [];
+            var svgns = "http://www.w3.org/2000/svg";
             var rows = null;
 
             scope.settings = {
@@ -24,6 +24,7 @@ var f = function ($compile) {
                 occupiedColourFg: attrs.occupiedColourFg || '#BB1F31',
                 selectedColourBg: attrs.selectedColourBg || '#7854AF',
                 selectedColourFg: attrs.selectedColourFg || '#472085',
+                backDropColour: attrs.backDropColour || 'transparent'
             };
 
             var structure =
@@ -65,8 +66,6 @@ var f = function ($compile) {
             scope.$watch('rows', onRowDataChanged);
 
             var drawSquare = function (selected, xPos, yPos, width, height, displayName) {
-                var svgns = "http://www.w3.org/2000/svg";
-
                 var fontSize = structure.eachSquare.width * 0.4;
                 var seatColour = '#000000';
                 var textColour = '#000000';
@@ -152,6 +151,15 @@ var f = function ($compile) {
                         onSquareClick(seatBox, selNode);
                     }
                 }
+                
+                var rect = document.createElementNS(svgns, 'rect');
+                rect.setAttributeNS(null, 'x', 0);
+                rect.setAttributeNS(null, 'y', 0);
+                rect.setAttributeNS(null, 'width', scope.settings.canvasWidth);
+                rect.setAttributeNS(null, 'height', scope.settings.canvasHeight);
+                rect.setAttributeNS(null, 'fill', scope.settings.backDropColour);
+                var parent = document.getElementById('canvasId');
+                parent.appendChild(rect);
 
                 var lastUp = 0;
                 for (var i = 0; i < rows.length; ++i) {
