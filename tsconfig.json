@@ -7,7 +7,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "kerusvg": ["./dist/kerusvg"]
+      "ngx-keruc-seatpicker": ["./projects/kerusvg/src/public-api.ts"]
     },
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,

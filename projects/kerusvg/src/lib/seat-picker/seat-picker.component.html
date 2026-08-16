@@ -1,0 +1,32 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  [attr.width]="layout().width"
+  [attr.height]="layout().height"
+>
+  <rect
+    x="0"
+    y="0"
+    [attr.width]="layout().width"
+    [attr.height]="layout().height"
+    [attr.fill]="resolvedColors().backDropColour"
+  />
+  @for (seat of layout().seats; track seat.node) {
+    <g class="keruc-seat" (click)="onSeatClick(seat)">
+      <rect
+        [attr.x]="seat.x"
+        [attr.y]="seat.y"
+        [attr.width]="seat.width"
+        [attr.height]="seat.height"
+        [attr.fill]="fill(seat.node)"
+      />
+      <text
+        text-anchor="middle"
+        dominant-baseline="central"
+        [attr.x]="seat.centerX"
+        [attr.y]="seat.centerY"
+        [attr.font-size]="seat.fontSize"
+        [attr.fill]="textFill(seat.node)"
+      >{{ seat.node.displayName }}</text>
+    </g>
+  }
+</svg>
