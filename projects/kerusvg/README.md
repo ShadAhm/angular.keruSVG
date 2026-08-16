@@ -1,64 +1,95 @@
-# Kerusvg
+# ngx-keruc-seatpicker
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.0.
+An Angular seat-picker component that renders an interactive seat map as inline
+SVG. Standalone, signal-based, and dependency-free beyond Angular itself.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Install
 
 ```bash
-ng generate --help
+npm install ngx-keruc-seatpicker
 ```
 
-## Building
+Requires Angular 22+ (`@angular/core` and `@angular/common` as peer dependencies).
 
-To build the library, run:
+## Usage
 
-```bash
-ng build kerusvg
+```ts
+import { Component, signal } from '@angular/core';
+import {
+  NodeType,
+  SeatNode,
+  SeatRow,
+  SeatState,
+  SeatPickerComponent,
+} from 'ngx-keruc-seatpicker';
+
+@Component({
+  selector: 'app-booking',
+  imports: [SeatPickerComponent],
+  template: `
+    <keruc-seatpicker
+      [rows]="rows()"
+      [canvasWidth]="560"
+      [canvasHeight]="560"
+      (selected)="onSelected($event)"
+      (deselected)="onDeselected($event)"
+      (disallowedSelected)="onDisallowed($event)"
+    />
+  `,
+})
+export class BookingComponent {
+  readonly rows = signal<SeatRow[]>([
+    {
+      rowName: 'A',
+      nodes: [
+        { type: NodeType.Seat, uniqueName: 'A1', displayName: 'A1', selected: SeatState.Vacant },
+        { type: NodeType.Seat, uniqueName: 'A2', displayName: 'A2', selected: SeatState.Occupied },
+        { type: NodeType.Spacer },
+        { type: NodeType.Seat, uniqueName: 'A4', displayName: 'A4', selected: SeatState.Vacant },
+      ],
+    },
+  ]);
+
+  onSelected(seat: SeatNode) {}
+  onDeselected(seat: SeatNode) {}
+  onDisallowed(seat: SeatNode) {}
+}
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+## Data model
 
-### Publishing the Library
+| Type | Values |
+| --- | --- |
+| `NodeType` | `Spacer = 0`, `Seat = 1` |
+| `SeatState` | `Vacant = 0`, `Occupied = 1`, `Selected = 2` |
+| `SeatNode` | `{ type, uniqueName?, displayName?, selected? }` |
+| `SeatRow` | `{ rowName?, nodes: SeatNode[] }` |
 
-Once the project is built, you can publish your library by following these steps:
+`Spacer` nodes reserve grid space (aisles/gaps) and render nothing.
 
-1. Navigate to the `dist` directory:
+## Inputs
 
-   ```bash
-   cd dist/kerusvg
-   ```
+| Input | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rows` (required) | `SeatRow[]` | — | The rows and nodes to render. |
+| `canvasWidth` | `number` | `500` | SVG width in px. |
+| `canvasHeight` | `number` | `500` | SVG height in px. |
+| `colors` | `SeatPickerColors` | see below | Per-state fill/text colors; provided keys override the defaults. |
 
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
+`SeatPickerColors` keys: `vacantColourBg`, `vacantColourFg`, `occupiedColourBg`,
+`occupiedColourFg`, `selectedColourBg`, `selectedColourFg`, `backDropColour`.
 
-## Running unit tests
+## Outputs
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+| Output | Payload | Fires when |
+| --- | --- | --- |
+| `selected` | `SeatNode` | A vacant seat is clicked (becomes selected). |
+| `deselected` | `SeatNode` | A selected seat is clicked (becomes vacant). |
+| `disallowedSelected` | `SeatNode` | An occupied seat is clicked (no state change). |
 
-```bash
-ng test
-```
+Selection state is stored on the `SeatNode` objects you pass in and toggled in
+place, so the array you bind stays the source of truth.
 
-## Running end-to-end tests
+## License
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+MIT
