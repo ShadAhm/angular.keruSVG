@@ -1,0 +1,186 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #e7ebf3;
+  background: radial-gradient(circle at top, #1b2130, #0d1017 60%);
+  font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+.site-header {
+  padding: 2.5rem 2rem 1rem;
+  text-align: center;
+}
+.site-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+.site-header p {
+  margin: 0.5rem 0 0;
+  color: #9aa4b6;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 1.5rem;
+  align-items: start;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
+}
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stage h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7f8aa0;
+  margin: 1.5rem 0 0.75rem;
+}
+.stage h2:first-child {
+  margin-top: 0;
+}
+.hint {
+  margin: 0 0 0.75rem;
+  color: #9aa4b6;
+  font-size: 0.85rem;
+}
+
+keruc-seatpicker {
+  display: inline-block;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: #10141d;
+  box-shadow: inset 0 0 0 1px #232a38;
+  max-width: 100%;
+}
+keruc-seatpicker svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.card {
+  background: #131826;
+  border: 1px solid #222a3b;
+  border-radius: 12px;
+  padding: 1rem;
+}
+.card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7f8aa0;
+}
+.muted {
+  color: #6b7488;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.chip {
+  background: #472085;
+  color: #d9ccf5;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.event {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  background: #0e131e;
+}
+.event-kind {
+  text-transform: capitalize;
+  color: #9aa4b6;
+}
+.event-seat {
+  font-weight: 700;
+}
+.event--selected .event-seat {
+  color: #b79cf0;
+}
+.event--deselected .event-seat {
+  color: #86d873;
+}
+.event--disallowed .event-seat {
+  color: #f56979;
+}
+
+.legend ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.swatch--vacant {
+  background: #76d75d;
+}
+.swatch--occupied {
+  background: #f56979;
+}
+.swatch--selected {
+  background: #7854af;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: #6b7488;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.site-footer a {
+  color: #9aa4b6;
+  text-decoration: none;
+}
+.site-footer a:hover {
+  color: #e7ebf3;
+}
