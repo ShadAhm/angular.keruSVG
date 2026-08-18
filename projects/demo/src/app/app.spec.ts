@@ -19,6 +19,6 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('ngx-keruc-seatpicker');
-    expect(compiled.querySelectorAll('keruc-seatpicker').length).toBe(2);
+    expect(compiled.querySelectorAll('keruc-seatpicker').length).toBe(3);
   });
 });

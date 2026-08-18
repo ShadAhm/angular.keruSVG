@@ -1,6 +1,7 @@
-import { computeLayout } from './layout';
+import { computeFreeformLayout, computeLayout } from './layout';
 import { NodeType } from './models/node-type.enum';
 import { SeatState } from './models/seat-state.enum';
+import { SeatElement } from './models/seat-element.model';
 import { SeatRow } from './models/seat-row.model';
 
 const seat = (name: string, selected = SeatState.Vacant): SeatRow['nodes'][number] => ({
@@ -14,12 +15,12 @@ const spacer = (): SeatRow['nodes'][number] => ({ type: NodeType.Spacer });
 describe('computeLayout', () => {
   it('returns an empty layout for no rows', () => {
     const layout = computeLayout([], 500, 500);
-    expect(layout).toEqual({ width: 500, height: 500, seats: [] });
+    expect(layout).toEqual({ width: 500, height: 500, seats: [], elements: [] });
   });
 
   it('returns an empty layout when rows contain no nodes', () => {
     const layout = computeLayout([{ nodes: [] }], 400, 300);
-    expect(layout).toEqual({ width: 400, height: 300, seats: [] });
+    expect(layout).toEqual({ width: 400, height: 300, seats: [], elements: [] });
   });
 
   it('positions a single seat using the ported geometry', () => {
@@ -63,5 +64,89 @@ describe('computeLayout', () => {
     const node = seat('A1', SeatState.Occupied);
     const layout = computeLayout([{ nodes: [node] }], 500, 500);
     expect(layout.seats[0].node).toBe(node);
+  });
+
+  it('reports no elements and zero rotation in grid mode', () => {
+    const layout = computeLayout([{ nodes: [seat('A1')] }], 500, 500);
+    expect(layout.elements).toEqual([]);
+    expect(layout.seats[0].rotation).toBe(0);
+  });
+});
+
+const freeformSeat = (name: string, x: number, y: number, rotation?: number) => ({
+  type: NodeType.Seat,
+  uniqueName: name,
+  displayName: name,
+  selected: SeatState.Vacant,
+  x,
+  y,
+  rotation,
+});
+
+describe('computeFreeformLayout', () => {
+  it('places a seat at its x/y percent of the content box and carries rotation', () => {
+    const layout = computeFreeformLayout(
+      [{ nodes: [freeformSeat('A1', 20, 40, -5)] }],
+      [],
+      400,
+      200,
+      '2:1',
+      20,
+    );
+    expect(layout.seats).toHaveLength(1);
+    expect(layout.seats[0]).toMatchObject({
+      centerX: 80,
+      centerY: 80,
+      width: 20,
+      height: 20,
+      x: 70,
+      y: 70,
+      rotation: -5,
+    });
+  });
+
+  it('positions and sizes an element from its percent geometry', () => {
+    const screen: SeatElement = {
+      kind: 'screen',
+      label: 'Screen',
+      x: 50,
+      y: 5,
+      width: 80,
+      height: 4,
+    };
+    const layout = computeFreeformLayout([{ nodes: [] }], [screen], 400, 200, '2:1');
+    expect(layout.elements).toHaveLength(1);
+    expect(layout.elements[0]).toMatchObject({
+      centerX: 200,
+      centerY: 10,
+      width: 320,
+      height: 8,
+      x: 40,
+      y: 6,
+    });
+  });
+
+  it('letterboxes an undistorted content box for the aspect ratio', () => {
+    // 2:1 box inside a 400x400 canvas → 400x200, offset 100px vertically
+    const layout = computeFreeformLayout(
+      [{ nodes: [freeformSeat('A1', 50, 50)] }],
+      [],
+      400,
+      400,
+      '2:1',
+      20,
+    );
+    expect(layout.seats[0].centerX).toBe(200);
+    expect(layout.seats[0].centerY).toBe(200);
+  });
+
+  it('ignores spacer nodes', () => {
+    const layout = computeFreeformLayout(
+      [{ nodes: [freeformSeat('A1', 10, 10), { type: NodeType.Spacer }] }],
+      [],
+      500,
+      500,
+    );
+    expect(layout.seats).toHaveLength(1);
   });
 });

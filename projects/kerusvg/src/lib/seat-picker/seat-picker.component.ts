@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { computeLayout, PositionedSeat } from '../layout';
+import { computeFreeformLayout, computeLayout, PositionedElement, PositionedSeat } from '../layout';
 import { NodeType } from '../models/node-type.enum';
 import { SeatState } from '../models/seat-state.enum';
+import { SeatElement } from '../models/seat-element.model';
 import { SeatNode } from '../models/seat-node.model';
 import { SeatRow } from '../models/seat-row.model';
-import {
-  DEFAULT_COLORS,
-  SeatPickerColors,
-} from '../models/seat-picker-colors.model';
+import { DEFAULT_COLORS, SeatPickerColors } from '../models/seat-picker-colors.model';
+
+export type SeatPickerLayout = 'grid' | 'freeform';
 
 @Component({
   selector: 'keruc-seatpicker',
@@ -21,6 +21,15 @@ export class SeatPickerComponent {
   readonly canvasHeight = input<number>(500);
   readonly colors = input<SeatPickerColors>({});
 
+  /** Non-bookable features (screens, stages, ...) drawn in freeform layout. */
+  readonly elements = input<SeatElement[]>([]);
+  /** Rendering mode. `grid` (default) uses row/column geometry; `freeform` uses x/y. */
+  readonly layout = input<SeatPickerLayout>('grid');
+  /** Canvas proportions for freeform coordinates, "width:height". */
+  readonly aspectRatio = input<string>('1:1');
+  /** Optional fixed seat square size (px) for freeform; derived when omitted. */
+  readonly seatSize = input<number | undefined>(undefined);
+
   readonly selected = output<SeatNode>();
   readonly deselected = output<SeatNode>();
   readonly disallowedSelected = output<SeatNode>();
@@ -30,8 +39,17 @@ export class SeatPickerComponent {
     ...this.colors(),
   }));
 
-  protected readonly layout = computed(() =>
-    computeLayout(this.rows(), this.canvasWidth(), this.canvasHeight()),
+  protected readonly computedLayout = computed(() =>
+    this.layout() === 'freeform'
+      ? computeFreeformLayout(
+          this.rows(),
+          this.elements(),
+          this.canvasWidth(),
+          this.canvasHeight(),
+          this.aspectRatio(),
+          this.seatSize(),
+        )
+      : computeLayout(this.rows(), this.canvasWidth(), this.canvasHeight()),
   );
 
   protected fill(node: SeatNode): string {
@@ -41,6 +59,10 @@ export class SeatPickerComponent {
         return colors.selectedColourBg;
       case SeatState.Occupied:
         return colors.occupiedColourBg;
+      case SeatState.Held:
+        return colors.heldColourBg;
+      case SeatState.Blocked:
+        return colors.blockedColourBg;
       default:
         return colors.vacantColourBg;
     }
@@ -53,9 +75,26 @@ export class SeatPickerComponent {
         return colors.selectedColourFg;
       case SeatState.Occupied:
         return colors.occupiedColourFg;
+      case SeatState.Held:
+        return colors.heldColourFg;
+      case SeatState.Blocked:
+        return colors.blockedColourFg;
       default:
         return colors.vacantColourFg;
     }
+  }
+
+  protected elementFill(): string {
+    return this.resolvedColors().elementColourBg;
+  }
+
+  protected elementTextFill(): string {
+    return this.resolvedColors().elementColourFg;
+  }
+
+  /** SVG rotate() transform for a positioned seat or element; empty when 0°. */
+  protected transform(item: PositionedSeat | PositionedElement): string | null {
+    return item.rotation ? `rotate(${item.rotation} ${item.centerX} ${item.centerY})` : null;
   }
 
   protected onSeatClick(seat: PositionedSeat): void {
@@ -66,6 +105,8 @@ export class SeatPickerComponent {
 
     switch (node.selected) {
       case SeatState.Occupied:
+      case SeatState.Held:
+      case SeatState.Blocked:
         this.disallowedSelected.emit(node);
         return;
       case SeatState.Selected:

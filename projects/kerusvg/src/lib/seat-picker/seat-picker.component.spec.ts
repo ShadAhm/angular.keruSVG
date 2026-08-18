@@ -134,9 +134,7 @@ describe('SeatPickerComponent', () => {
   `,
 })
 class TwoInstancesHost {
-  readonly firstRows = signal<SeatRow[]>([
-    { rowName: 'A', nodes: [seat('A1', SeatState.Vacant)] },
-  ]);
+  readonly firstRows = signal<SeatRow[]>([{ rowName: 'A', nodes: [seat('A1', SeatState.Vacant)] }]);
   readonly secondRows = signal<SeatRow[]>([
     { rowName: 'Z', nodes: [seat('Z1', SeatState.Vacant)] },
   ]);
@@ -163,5 +161,68 @@ describe('SeatPickerComponent multi-instance (bug #3)', () => {
     expect(rectFill(second.querySelector('g.keruc-seat') as SVGGElement)).toBe(
       DEFAULT_COLORS.vacantColourBg,
     );
+  });
+});
+
+describe('SeatPickerComponent Held/Blocked states', () => {
+  let fixture: ComponentFixture<SeatPickerComponent>;
+  let component: SeatPickerComponent;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [SeatPickerComponent] }).compileComponents();
+    fixture = TestBed.createComponent(SeatPickerComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('rows', [
+      {
+        rowName: 'A',
+        nodes: [seat('A1', SeatState.Held), seat('A2', SeatState.Blocked)],
+      },
+    ] satisfies SeatRow[]);
+    fixture.detectChanges();
+  });
+
+  it('colors held and blocked seats with their own fills', () => {
+    const [held, blocked] = seatGroups(fixture);
+    expect(rectFill(held)).toBe(DEFAULT_COLORS.heldColourBg);
+    expect(rectFill(blocked)).toBe(DEFAULT_COLORS.blockedColourBg);
+  });
+
+  it('treats held and blocked as non-selectable (emits disallowed, no change)', () => {
+    const disallowed: SeatNode[] = [];
+    const selected: SeatNode[] = [];
+    component.disallowedSelected.subscribe((n) => disallowed.push(n));
+    component.selected.subscribe((n) => selected.push(n));
+
+    const [held, blocked] = seatGroups(fixture);
+    held.dispatchEvent(new MouseEvent('click'));
+    blocked.dispatchEvent(new MouseEvent('click'));
+    fixture.detectChanges();
+
+    expect(selected).toHaveLength(0);
+    expect(disallowed.map((n) => n.uniqueName)).toEqual(['A1', 'A2']);
+    expect(rectFill(seatGroups(fixture)[0])).toBe(DEFAULT_COLORS.heldColourBg);
+    expect(rectFill(seatGroups(fixture)[1])).toBe(DEFAULT_COLORS.blockedColourBg);
+  });
+});
+
+describe('SeatPickerComponent freeform rendering', () => {
+  it('draws elements and applies a rotation transform to a tilted seat', async () => {
+    await TestBed.configureTestingModule({ imports: [SeatPickerComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(SeatPickerComponent);
+    fixture.componentRef.setInput('rows', [
+      { rowName: 'A', nodes: [{ ...seat('A1', SeatState.Vacant), x: 30, y: 40, rotation: -8 }] },
+    ] satisfies SeatRow[]);
+    fixture.componentRef.setInput('layout', 'freeform');
+    fixture.componentRef.setInput('elements', [
+      { kind: 'screen', label: 'Screen', x: 50, y: 5, width: 80, height: 4 },
+    ]);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('g.keruc-element')).toHaveLength(1);
+    expect(host.querySelector('g.keruc-element text')!.textContent).toContain('Screen');
+
+    const seatGroup = host.querySelector('g.keruc-seat')!;
+    expect(seatGroup.getAttribute('transform')).toMatch(/^rotate\(-8 /);
   });
 });
