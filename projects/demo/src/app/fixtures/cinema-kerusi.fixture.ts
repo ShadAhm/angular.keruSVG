@@ -16,7 +16,7 @@ const SLOTS = 16;
 /** Slot indices left empty to form the two aisles (§4.3.2: no filler objects). */
 const AISLE_SLOTS = new Set([3, 12]);
 
-const HALF_WIDTH = 37.5; // horizontal spread either side of center (x = 50)
+const HALF_WIDTH = 33.75; // horizontal spread either side of center (x = 50) — tuned so seat pitch matches the row pitch, keeping seats close with no gaps
 const FIRST_ROW_Y = 22; // first row, at its outer ends
 const ROW_STEP = 8; // vertical gap between rows
 const CURVE_DEPTH = 6; // how much further from the screen a row's center sits
