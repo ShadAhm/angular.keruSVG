@@ -26,7 +26,7 @@ npm install ngx-keruc-seatpicker
 import { SeatPickerComponent, NodeType, SeatState, SeatRow } from 'ngx-keruc-seatpicker';
 
 // in a standalone component:
-imports: [SeatPickerComponent]
+imports: [SeatPickerComponent];
 ```
 
 ```html
@@ -41,12 +41,16 @@ imports: [SeatPickerComponent]
 See the [library README](projects/kerusvg/README.md) for the full API (inputs,
 outputs, data model, and color configuration).
 
+It can also consume the vendor-neutral **Kerusi Seat Map & Availability Format**
+(a `KerusiMap` + `KerusiState` pair) via a validating adapter — see
+[docs/kerusi.md](docs/kerusi.md), with a feature-by-feature audit in [docs/kerusi-conformance.md](docs/kerusi-conformance.md).
+
 ## Repository layout
 
-| Path | What it is |
-| --- | --- |
-| `projects/kerusvg/` | The publishable library (`ngx-keruc-seatpicker`). |
-| `projects/demo/` | Demo app, deployed to GitHub Pages. |
+| Path                        | What it is                                                |
+| --------------------------- | --------------------------------------------------------- |
+| `projects/kerusvg/`         | The publishable library (`ngx-keruc-seatpicker`).         |
+| `projects/demo/`            | Demo app, deployed to GitHub Pages.                       |
 | `legacy/angular.keruSVG.js` | The original AngularJS 1.x directive, kept for reference. |
 
 ## Develop

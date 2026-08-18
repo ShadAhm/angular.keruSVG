@@ -3,70 +3,137 @@
   <p>An interactive seat map rendered as inline SVG, for modern Angular.</p>
 </header>
 
-<main class="layout">
-  <section class="stage">
-    <h2>Auditorium</h2>
-    <keruc-seatpicker
-      [rows]="rows()"
-      [canvasWidth]="560"
-      [canvasHeight]="560"
-      (selected)="onSelected($event)"
-      (deselected)="onDeselected($event)"
-      (disallowedSelected)="onDisallowed($event)"
-    />
+<main>
+  <section class="layout" aria-labelledby="main-demo-heading">
+    <div class="stage">
+      <h2 id="main-demo-heading">Auditorium</h2>
+      <p class="hint">
+        The core component: a grid of rows and nodes, with spacers holding the aisles open.
+      </p>
+      <keruc-seatpicker
+        [rows]="rows()"
+        [canvasWidth]="560"
+        [canvasHeight]="560"
+        (selected)="onSelected($event)"
+        (deselected)="onDeselected($event)"
+        (disallowedSelected)="onDisallowed($event)"
+      />
+    </div>
 
-    <h2>Second instance (custom colors &amp; size)</h2>
-    <p class="hint">
-      Two pickers on one page stay fully independent &mdash; clicking here never
-      touches the auditorium above.
-    </p>
-    <keruc-seatpicker
-      [rows]="compactRows()"
-      [colors]="compactColors"
-      [canvasWidth]="260"
-      [canvasHeight]="160"
-    />
+    <aside class="panel">
+      <div class="card">
+        <h3>Selected seats</h3>
+        @if (selectedSeats().length) {
+          <ul class="chips">
+            @for (name of selectedSeats(); track name) {
+              <li class="chip">{{ name }}</li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No seats selected yet.</p>
+        }
+      </div>
+
+      <div class="card">
+        <h3>Events</h3>
+        @if (events().length) {
+          <ul class="events">
+            @for (event of events(); track $index) {
+              <li class="event event--{{ event.kind }}">
+                <span class="event-kind">{{ event.kind }}</span>
+                <span class="event-seat">{{ event.seat }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">Click a seat to see events here.</p>
+        }
+      </div>
+
+      <div class="card legend">
+        <h3>Legend</h3>
+        <ul>
+          <li><span class="swatch swatch--vacant"></span> Vacant</li>
+          <li><span class="swatch swatch--occupied"></span> Occupied</li>
+          <li><span class="swatch swatch--selected"></span> Selected</li>
+        </ul>
+      </div>
+    </aside>
   </section>
 
-  <aside class="panel">
-    <div class="card">
-      <h3>Selected seats</h3>
-      @if (selectedSeats().length) {
-        <ul class="chips">
-          @for (name of selectedSeats(); track name) {
-            <li class="chip">{{ name }}</li>
-          }
-        </ul>
-      } @else {
-        <p class="muted">No seats selected yet.</p>
-      }
-    </div>
+  <section class="showcase" aria-labelledby="showcase-heading">
+    <div class="showcase-inner">
+      <div class="showcase-head">
+        <h2 id="showcase-heading">More capabilities</h2>
+        <p class="hint">
+          Standalone examples below &mdash; each keeps its own state, independent of the auditorium
+          and its panel above.
+        </p>
+      </div>
 
-    <div class="card">
-      <h3>Events</h3>
-      @if (events().length) {
-        <ul class="events">
-          @for (event of events(); track $index) {
-            <li class="event event--{{ event.kind }}">
-              <span class="event-kind">{{ event.kind }}</span>
-              <span class="event-seat">{{ event.seat }}</span>
-            </li>
-          }
-        </ul>
-      } @else {
-        <p class="muted">Click a seat to see events here.</p>
-      }
-    </div>
+      <article class="demo-card">
+        <h3>Curved cinema, from a Kerusi document</h3>
+        <p class="hint">
+          Built from a <code>KerusiMap</code> + <code>KerusiState</code> and fed through
+          <code>adaptKerusiMap</code>. Rows arc around the screen with each seat angled to face it;
+          the screen and exits are non-bookable elements; aisles are simply absent seats. Booked,
+          held and blocked seats are all distinct and unselectable.
+        </p>
 
-    <div class="card legend">
-      <h3>Legend</h3>
-      <ul>
-        <li><span class="swatch swatch--vacant"></span> Vacant</li>
-        <li><span class="swatch swatch--occupied"></span> Occupied</li>
-        <li><span class="swatch swatch--selected"></span> Selected</li>
-      </ul>
+        <keruc-seatpicker
+          [rows]="cinemaRows()"
+          [elements]="cinemaElements()"
+          [layout]="cinemaLayout"
+          [aspectRatio]="cinemaAspectRatio"
+          [colors]="cinemaColors"
+          [canvasWidth]="760"
+          [canvasHeight]="460"
+          [seatSize]="30"
+          (selected)="onCinemaChanged()"
+          (deselected)="onCinemaChanged()"
+          (disallowedSelected)="onCinemaDisallowed($event)"
+        />
+
+        <div class="cinema-status">
+          @if (cinemaSelected().length) {
+            <ul class="chips">
+              @for (name of cinemaSelected(); track name) {
+                <li class="chip">{{ name }}</li>
+              }
+            </ul>
+            <p class="total">Total: MYR {{ cinemaTotal() }}</p>
+          } @else {
+            <p class="muted">Pick a seat &mdash; prices come from the map's tiers.</p>
+          }
+          @if (cinemaStatus()) {
+            <p class="warn">{{ cinemaStatus() }}</p>
+          }
+        </div>
+
+        <ul class="legend-inline">
+          <li><span class="swatch" style="background: #3a8f63"></span> Vacant</li>
+          <li><span class="swatch" style="background: #e0a800"></span> Selected</li>
+          <li><span class="swatch" style="background: #c8434f"></span> Booked</li>
+          <li><span class="swatch" style="background: #e6a817"></span> Held</li>
+          <li><span class="swatch" style="background: #5a616e"></span> Blocked</li>
+        </ul>
+      </article>
+
+      <article class="demo-card">
+        <h3>Second instance (custom colors &amp; size)</h3>
+        <p class="hint">
+          Two pickers on one page stay fully independent &mdash; clicking here never touches the
+          auditorium above.
+        </p>
+        <keruc-seatpicker
+          [rows]="compactRows()"
+          [colors]="compactColors"
+          [canvasWidth]="260"
+          [canvasHeight]="160"
+        />
+      </article>
     </div>
-  </aside>
+  </section>
 </main>
 
 <footer class="site-footer">

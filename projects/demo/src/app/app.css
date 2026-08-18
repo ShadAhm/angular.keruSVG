@@ -165,6 +165,12 @@ keruc-seatpicker svg {
 .swatch--occupied {
   background: #f56979;
 }
+.swatch--held {
+  background: #e6a817;
+}
+.swatch--blocked {
+  background: #5a616e;
+}
 .swatch--selected {
   background: #7854af;
 }
@@ -183,4 +189,89 @@ keruc-seatpicker svg {
 }
 .site-footer a:hover {
   color: #e7ebf3;
+}
+
+/* --- Main demo / showcase separation ------------------------------------- */
+
+.layout {
+  padding-bottom: 2.5rem;
+}
+
+.showcase {
+  border-top: 1px solid #232a38;
+  background: #0a0d14;
+  padding: 2rem 0 3rem;
+}
+.showcase-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.showcase-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7f8aa0;
+}
+.showcase-head .hint {
+  margin: 0.4rem 0 0;
+}
+
+.demo-card {
+  background: #131826;
+  border: 1px solid #222a3b;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem 1.35rem;
+}
+.demo-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: #e7ebf3;
+}
+.demo-card .hint {
+  margin: 0 0 0.9rem;
+  max-width: 68ch;
+}
+
+/* --- Cinema status line --------------------------------------------------- */
+
+.cinema-status {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-height: 1.75rem;
+}
+.cinema-status .total {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e0a800;
+}
+.cinema-status .warn {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #f0a6ae;
+}
+
+.legend-inline {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid #1d2432;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  color: #9aa4b6;
+}
+.legend-inline li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }

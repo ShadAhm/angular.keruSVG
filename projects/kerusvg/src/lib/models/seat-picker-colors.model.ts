@@ -5,6 +5,12 @@ export interface SeatPickerColors {
   occupiedColourFg?: string;
   selectedColourBg?: string;
   selectedColourFg?: string;
+  heldColourBg?: string;
+  heldColourFg?: string;
+  blockedColourBg?: string;
+  blockedColourFg?: string;
+  elementColourBg?: string;
+  elementColourFg?: string;
   backDropColour?: string;
 }
 
@@ -15,5 +21,11 @@ export const DEFAULT_COLORS: Required<SeatPickerColors> = {
   occupiedColourFg: '#BB1F31',
   selectedColourBg: '#7854AF',
   selectedColourFg: '#472085',
+  heldColourBg: '#E6A817',
+  heldColourFg: '#6B4A00',
+  blockedColourBg: '#5A616E',
+  blockedColourFg: '#20242C',
+  elementColourBg: '#D7DEEA',
+  elementColourFg: '#3A4353',
   backDropColour: 'transparent',
 };
