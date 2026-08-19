@@ -1,4 +1,4 @@
-import { KerusiMap, KerusiState, Seat } from 'ngx-keruc-seatpicker';
+import { KerusiMap, KerusiState, Seat } from 'ngx-kerusi-seatmap';
 
 // An "everything" cinema expressed in the Kerusi Seat Map & Availability
 // Format. It exercises the capabilities the plain grid demo cannot show:
