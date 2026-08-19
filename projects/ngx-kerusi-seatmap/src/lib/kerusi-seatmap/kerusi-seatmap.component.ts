@@ -125,6 +125,11 @@ export class KerusiSeatmapComponent {
   readonly seatGap = input<number>(6);
   /** Freeform viewBox width; height follows the section's aspect ratio. */
   readonly freeformBasis = input<number>(1000);
+  /**
+   * CSS pixels per viewBox unit. Caps each section at its natural size so a
+   * narrow section and a wide one in the same map draw seats the same size.
+   */
+  readonly unitScale = input<number>(1);
   readonly showSectionLabels = input<boolean>(true);
   readonly showLegend = input<boolean>(false);
   readonly showLegendPrices = input<boolean>(true);
@@ -168,7 +173,14 @@ export class KerusiSeatmapComponent {
 
   // --- internal state -------------------------------------------------------
 
-  private readonly focusedSeatId = signal<string | null>(null);
+  /**
+   * The seat holding each section's tab stop, keyed by section id.
+   *
+   * Per section, not per map: arrow keys never cross a section boundary, so a
+   * single map-wide tab stop would leave every section after the first
+   * unreachable by keyboard. Tab moves between sections, arrows move within.
+   */
+  private readonly focusedSeatIds = signal<Readonly<Record<string, string>>>({});
   private readonly announcement = signal('');
   /** Bumped by the hold ticker to force the state to be re-derived. */
   private readonly expiryTick = signal(0);
@@ -187,12 +199,25 @@ export class KerusiSeatmapComponent {
       }
     });
 
-    // Keep exactly one tab stop alive as sections and availability change.
+    // Keep every section's tab stop pointing at a seat that still exists.
     effect(() => {
       const model = this.renderMap();
-      const current = this.focusedSeatId();
-      if (!current || !model.seatsById.has(current)) {
-        this.focusedSeatId.set(model.sections[0]?.seats[0]?.id ?? null);
+      const current = this.focusedSeatIds();
+      const next: Record<string, string> = {};
+      let changed = Object.keys(current).length !== model.sections.length;
+
+      for (const section of model.sections) {
+        const held = current[section.id];
+        const valid = held && section.seats.some((seat) => seat.id === held);
+        const resolved = valid ? held : section.seats[0]?.id;
+        if (resolved) {
+          next[section.id] = resolved;
+          changed ||= resolved !== held;
+        }
+      }
+
+      if (changed) {
+        this.focusedSeatIds.set(next);
       }
     });
 
@@ -315,7 +340,10 @@ export class KerusiSeatmapComponent {
     return `kerusi-section-${this.renderMap().id}-${section.id}`;
   }
 
-  protected readonly focusedSeat = computed(() => this.focusedSeatId());
+  /** The seat holding this section's tab stop. */
+  protected focusedSeatIn(section: RenderSection): string | null {
+    return this.focusedSeatIds()[section.id] ?? null;
+  }
 
   // --- interaction ----------------------------------------------------------
 
@@ -349,11 +377,12 @@ export class KerusiSeatmapComponent {
   }
 
   protected onSeatFocused(seatId: string): void {
-    this.focusedSeatId.set(seatId);
     const seat = this.renderMap().seatsById.get(seatId);
-    if (seat) {
-      this.seatFocus.emit(seat);
+    if (!seat) {
+      return;
     }
+    this.setFocusedSeat(seat.sectionId, seatId);
+    this.seatFocus.emit(seat);
   }
 
   /**
@@ -417,8 +446,15 @@ export class KerusiSeatmapComponent {
 
     if (target) {
       event.preventDefault();
-      this.moveFocusTo(target);
+      this.moveFocusTo(section.id, target);
     }
+  }
+
+  private setFocusedSeat(sectionId: string, seatId: string): void {
+    if (this.focusedSeatIds()[sectionId] === seatId) {
+      return;
+    }
+    this.focusedSeatIds.update((all) => ({ ...all, [sectionId]: seatId }));
   }
 
   /**
@@ -428,8 +464,8 @@ export class KerusiSeatmapComponent {
    * selector unescaped — and `CSS.escape` is absent in jsdom and under SSR.
    * Scanning the rendered nodes avoids both problems.
    */
-  private moveFocusTo(seatId: string): void {
-    this.focusedSeatId.set(seatId);
+  private moveFocusTo(sectionId: string, seatId: string): void {
+    this.setFocusedSeat(sectionId, seatId);
     const nodes = (this.host.nativeElement as HTMLElement).querySelectorAll<SVGGElement>(
       '[data-seat-id]',
     );

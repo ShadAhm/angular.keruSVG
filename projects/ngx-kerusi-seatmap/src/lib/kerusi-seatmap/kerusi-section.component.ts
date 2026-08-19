@@ -44,6 +44,16 @@ export class KerusiSectionComponent {
   readonly typeColors = input<boolean>(true);
   /** When false, seats render but do not respond to pointer or keyboard. */
   readonly interactive = input<boolean>(true);
+  /**
+   * CSS pixels per viewBox unit, at the section's natural size.
+   *
+   * Without a cap every section stretches to the full container width, so in a
+   * four-tier theatre the narrow box row would draw seats several times the
+   * size of the orchestra's. Capping each section at its own intrinsic width
+   * keeps a seat the same size everywhere; a section too wide to fit still
+   * scales down to the container.
+   */
+  readonly unitScale = input<number>(1);
 
   readonly seatActivate = output<string>();
   readonly seatFocused = output<string>();
@@ -52,6 +62,9 @@ export class KerusiSectionComponent {
   protected readonly viewBox = computed(
     () => `0 0 ${this.layout().width} ${this.layout().height}`,
   );
+
+  /** The section's natural width in CSS pixels; it never draws wider. */
+  protected readonly naturalWidth = computed(() => this.layout().width * this.unitScale());
 
   protected isSelected(placed: PlacedSeat): boolean {
     return this.selection().has(placed.seat.id);

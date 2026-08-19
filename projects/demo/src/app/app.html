@@ -1,138 +1,195 @@
 <header class="site-header">
   <h1>ngx-kerusi-seatmap</h1>
-  <p>An interactive seat map rendered as inline SVG, for modern Angular.</p>
+  <p>
+    An Angular seat map that renders
+    <a href="https://github.com/ShadAhm/kerusi">Kerusi</a> documents directly — every positioning
+    mode, sections as real render units, and a keyboard-navigable, screen-reader-friendly SVG.
+  </p>
 </header>
 
 <main>
-  <section class="layout" aria-labelledby="main-demo-heading">
-    <div class="stage">
-      <h2 id="main-demo-heading">Auditorium</h2>
-      <p class="hint">
-        The core component: a grid of rows and nodes, with spacers holding the aisles open.
-      </p>
-      <kerusi-seatpicker
-        [rows]="rows()"
-        [canvasWidth]="560"
-        [canvasHeight]="560"
-        (selected)="onSelected($event)"
-        (deselected)="onDeselected($event)"
-        (disallowedSelected)="onDisallowed($event)"
-      />
+  <nav class="scenarios" aria-label="Venue scenarios">
+    @for (item of scenarios; track item.id) {
+      <button
+        type="button"
+        class="scenario-tab"
+        [class.scenario-tab--active]="item.id === scenarioId()"
+        [attr.aria-pressed]="item.id === scenarioId()"
+        (click)="onScenarioChange(item.id)"
+      >
+        {{ item.name }}
+      </button>
+    }
+  </nav>
+
+  <section class="scenario" [attr.aria-label]="scenario().name">
+    <div class="scenario-intro">
+      <div>
+        <h2>{{ scenario().map.name }}</h2>
+        <p class="hint">{{ scenario().blurb }}</p>
+      </div>
+
+      <div class="controls">
+        <label>
+          Locale
+          <select [value]="locale()" (change)="locale.set($any($event.target).value)">
+            @for (item of locales; track item.id) {
+              <option [value]="item.id">{{ item.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" [checked]="typeColors()" (change)="typeColors.set($any($event.target).checked)" />
+          Seat-type colours
+        </label>
+        <label class="toggle">
+          <input type="checkbox" [checked]="showLegend()" (change)="showLegend.set($any($event.target).checked)" />
+          Legend
+        </label>
+      </div>
     </div>
 
-    <aside class="panel">
-      <div class="card">
-        <h3>Selected seats</h3>
-        @if (selectedSeats().length) {
-          <ul class="chips">
-            @for (name of selectedSeats(); track name) {
-              <li class="chip">{{ name }}</li>
-            }
-          </ul>
-        } @else {
-          <p class="muted">No seats selected yet.</p>
-        }
-      </div>
-
-      <div class="card">
-        <h3>Events</h3>
-        @if (events().length) {
-          <ul class="events">
-            @for (event of events(); track $index) {
-              <li class="event event--{{ event.kind }}">
-                <span class="event-kind">{{ event.kind }}</span>
-                <span class="event-seat">{{ event.seat }}</span>
-              </li>
-            }
-          </ul>
-        } @else {
-          <p class="muted">Click a seat to see events here.</p>
-        }
-      </div>
-
-      <div class="card legend">
-        <h3>Legend</h3>
-        <ul>
-          <li><span class="swatch swatch--vacant"></span> Vacant</li>
-          <li><span class="swatch swatch--occupied"></span> Occupied</li>
-          <li><span class="swatch swatch--selected"></span> Selected</li>
-        </ul>
-      </div>
-    </aside>
-  </section>
-
-  <section class="showcase" aria-labelledby="showcase-heading">
-    <div class="showcase-inner">
-      <div class="showcase-head">
-        <h2 id="showcase-heading">More capabilities</h2>
-        <p class="hint">
-          Standalone examples below &mdash; each keeps its own state, independent of the auditorium
-          and its panel above.
-        </p>
-      </div>
-
-      <article class="demo-card">
-        <h3>Curved cinema, from a Kerusi document</h3>
-        <p class="hint">
-          Built from a <code>KerusiMap</code> + <code>KerusiState</code> and fed through
-          <code>adaptKerusiMap</code>. Rows arc around the screen with each seat angled to face it;
-          the screen and exits are non-bookable elements; aisles are simply absent seats. Booked,
-          held and blocked seats are all distinct and unselectable.
-        </p>
-
-        <kerusi-seatpicker
-          [rows]="cinemaRows()"
-          [elements]="cinemaElements()"
-          [layout]="cinemaLayout"
-          [aspectRatio]="cinemaAspectRatio"
-          [colors]="cinemaColors"
-          [canvasWidth]="760"
-          [canvasHeight]="460"
-          [seatSize]="30"
-          (selected)="onCinemaChanged()"
-          (deselected)="onCinemaChanged()"
-          (disallowedSelected)="onCinemaDisallowed($event)"
+    <div class="scenario-body">
+      <div class="stage">
+        <kerusi-seatmap
+          [map]="scenario().map"
+          [state]="scenario().state"
+          [session]="scenario().session"
+          [selection]="selection()"
+          (selectionChange)="onSelectionChange($event)"
+          [locale]="locale()"
+          [seatSize]="scenario().seatSize ?? 28"
+          [typeColors]="typeColors()"
+          [showLegend]="showLegend()"
+          (seatDisallowed)="onDisallowed($event)"
+          (validationIssues)="issues.set($event)"
         />
 
-        <div class="cinema-status">
-          @if (cinemaSelected().length) {
-            <ul class="chips">
-              @for (name of cinemaSelected(); track name) {
-                <li class="chip">{{ name }}</li>
+        <p class="keyboard-hint">
+          Tab into the map, then use the arrow keys — they follow
+          <code>col</code> order, so an aisle is stepped across rather than into. Enter or Space
+          picks a seat; Escape clears.
+        </p>
+      </div>
+
+      <aside class="panel">
+        <div class="card">
+          <h3>Your selection</h3>
+          @if (summary().seats.length) {
+            <ul class="seat-list">
+              @for (seat of summary().seats; track seat.id) {
+                <li>
+                  <span class="seat-list__id">{{ seat.label }}</span>
+                  <span class="seat-list__type">{{ seat.typeLabel }}</span>
+                  <span class="seat-list__price">{{ seat.price }}</span>
+                  @if (seat.accessible) {
+                    <span class="badge" title="Wheelchair accessible">&#9855;</span>
+                  }
+                </li>
               }
             </ul>
-            <p class="total">Total: MYR {{ cinemaTotal() }}</p>
+            @if (summary().total) {
+              <p class="total">Total {{ summary().total }}</p>
+            }
+            @if (summary().unpriced) {
+              <p class="muted">{{ summary().unpriced }} seat(s) carry no price.</p>
+            }
           } @else {
-            <p class="muted">Pick a seat &mdash; prices come from the map's tiers.</p>
+            <p class="muted">
+              No seats picked. Prices resolve through the standard's order: the seat's own price,
+              then its tier, then its type's default.
+            </p>
           }
-          @if (cinemaStatus()) {
-            <p class="warn">{{ cinemaStatus() }}</p>
+          @if (lastDisallowed()) {
+            <p class="warn">{{ lastDisallowed() }}</p>
           }
         </div>
 
-        <ul class="legend-inline">
-          <li><span class="swatch" style="background: #3a8f63"></span> Vacant</li>
-          <li><span class="swatch" style="background: #e0a800"></span> Selected</li>
-          <li><span class="swatch" style="background: #c8434f"></span> Booked</li>
-          <li><span class="swatch" style="background: #e6a817"></span> Held</li>
-          <li><span class="swatch" style="background: #5a616e"></span> Blocked</li>
-        </ul>
-      </article>
+        <div class="card">
+          <h3>What this document shows</h3>
+          <ul class="highlights">
+            @for (item of scenario().highlights; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
 
-      <article class="demo-card">
-        <h3>Second instance (custom colors &amp; size)</h3>
-        <p class="hint">
-          Two pickers on one page stay fully independent &mdash; clicking here never touches the
-          auditorium above.
-        </p>
-        <kerusi-seatpicker
-          [rows]="compactRows()"
-          [colors]="compactColors"
-          [canvasWidth]="260"
-          [canvasHeight]="160"
-        />
-      </article>
+        <div class="card">
+          <h3>Sections</h3>
+          <table class="sections-table">
+            <thead>
+              <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Mode</th>
+                <th scope="col">Ratio</th>
+                <th scope="col">Seats</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (section of sectionSummary(); track section.id) {
+                <tr>
+                  <td>{{ section.label }}</td>
+                  <td>
+                    <code>{{ section.mode }}</code>
+                    @if (section.declared === 'inferred') {
+                      <span class="muted"> (inferred)</span>
+                    }
+                  </td>
+                  <td>{{ section.aspectRatio }}</td>
+                  <td>{{ section.seats }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Conformance</h3>
+          @if (issues().length === 0) {
+            <p class="ok">This document validates clean — no errors, no warnings.</p>
+          } @else {
+            <ul class="issues">
+              @for (issue of issues(); track $index) {
+                <li class="issue issue--{{ issue.severity }}">
+                  <code>{{ issue.rule }}</code>
+                  {{ issue.message }}
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </aside>
     </div>
+
+    <details class="source" [open]="showSource()">
+      <summary>The KerusiMap behind this view</summary>
+      <pre><code>{{ sourceJson() }}</code></pre>
+    </details>
+  </section>
+
+  <section class="legacy" aria-labelledby="legacy-heading">
+    <h2 id="legacy-heading">The pre-1.0 API still works</h2>
+    <p class="hint">
+      <code>&lt;kerusi-seatpicker&gt;</code> and its <code>SeatRow[]</code> model are deprecated but
+      unchanged, so existing code keeps running. It flattens every section into one run of rows and
+      mutates its nodes in place — which is why this card has to re-set its signal after each click.
+    </p>
+    <div class="legacy-stage">
+      <kerusi-seatpicker
+        [rows]="legacyRows()"
+        [canvasWidth]="420"
+        [canvasHeight]="300"
+        (selected)="onLegacyChanged()"
+        (deselected)="onLegacyChanged()"
+      />
+    </div>
+    @if (legacySelected().length) {
+      <ul class="chips">
+        @for (name of legacySelected(); track name) {
+          <li class="chip">{{ name }}</li>
+        }
+      </ul>
+    }
   </section>
 </main>
 
@@ -140,4 +197,6 @@
   <a href="https://github.com/ShadAhm/ngx-kerusi-seatmap">GitHub</a>
   <span>&middot;</span>
   <a href="https://www.npmjs.com/package/ngx-kerusi-seatmap">npm</a>
+  <span>&middot;</span>
+  <a href="https://github.com/ShadAhm/kerusi">The Kerusi standard</a>
 </footer>

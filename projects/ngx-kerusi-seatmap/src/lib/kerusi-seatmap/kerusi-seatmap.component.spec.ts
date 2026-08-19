@@ -241,10 +241,22 @@ describe('KerusiSeatmapComponent', () => {
     const key = (id: string, init: KeyboardEventInit) =>
       seat(id).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, ...init }));
 
-    it('gives each section exactly one tab stop', () => {
-      const stops = seats().filter((g) => g.getAttribute('tabindex') === '0');
-      expect(stops).toHaveLength(1);
-      expect(stops[0].getAttribute('data-seat-id')).toBe('A1');
+    it('gives EACH section its own tab stop, so every section is reachable', () => {
+      // A single map-wide tab stop would strand the balcony: arrow keys never
+      // cross a section boundary, so Tab is the only way in.
+      const stops = seats()
+        .filter((g) => g.getAttribute('tabindex') === '0')
+        .map((g) => g.getAttribute('data-seat-id'));
+      expect(stops).toEqual(['A1', 'L1']);
+    });
+
+    it('moves only the tab stop of the section being navigated', () => {
+      key('A1', { key: 'ArrowRight' });
+      fixture.detectChanges();
+      const stops = seats()
+        .filter((g) => g.getAttribute('tabindex') === '0')
+        .map((g) => g.getAttribute('data-seat-id'));
+      expect(stops).toEqual(['A2', 'L1']);
     });
 
     it('moves the tab stop with the arrow keys, skipping the aisle column', () => {
