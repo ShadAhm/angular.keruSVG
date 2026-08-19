@@ -6,8 +6,8 @@ import {
   SeatPickerColors,
   SeatRow,
   SeatState,
-} from 'ngx-keruc-seatpicker';
-import { SeatPickerComponent } from 'ngx-keruc-seatpicker';
+} from 'ngx-kerusi-seatmap';
+import { SeatPickerComponent } from 'ngx-kerusi-seatmap';
 import { SAMPLE_ROWS } from './fixtures/seat-data.fixture';
 import { CINEMA_KERUSI_MAP, CINEMA_KERUSI_STATE } from './fixtures/cinema-kerusi.fixture';
 

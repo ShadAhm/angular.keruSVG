@@ -1,0 +1,34 @@
+{
+  "name": "ngx-kerusi-seatmap",
+  "version": "1.0.0",
+  "description": "An Angular seat-map component that renders Kerusi Seat Map & Availability Format documents as interactive, accessible inline SVG.",
+  "keywords": [
+    "angular",
+    "kerusi",
+    "seat-map",
+    "seatmap",
+    "seat-picker",
+    "seat-selection",
+    "svg",
+    "booking",
+    "ticketing",
+    "cinema",
+    "airline",
+    "venue"
+  ],
+  "license": "MIT",
+  "author": "Arshad Ahmad",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShadAhm/ngx-kerusi-seatmap.git"
+  },
+  "homepage": "https://github.com/ShadAhm/ngx-kerusi-seatmap",
+  "peerDependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/core": "^22.1.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

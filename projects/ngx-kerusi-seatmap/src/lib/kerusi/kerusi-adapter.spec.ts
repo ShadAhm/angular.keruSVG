@@ -1,6 +1,6 @@
 import { adaptKerusiMap, applyStateDelta, kerusiToRows } from './kerusi-adapter';
-import { NodeType } from '../models/node-type.enum';
-import { SeatState } from '../models/seat-state.enum';
+import { NodeType } from '../legacy/models/node-type.enum';
+import { SeatState } from '../legacy/models/seat-state.enum';
 import { KerusiMap } from './kerusi-map.model';
 import { KerusiState, KerusiStateDelta } from './kerusi-state.model';
 import {

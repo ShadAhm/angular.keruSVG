@@ -31,7 +31,7 @@ function sampleRows(): SeatRow[] {
 
 function seatGroups(fixture: ComponentFixture<unknown>): SVGGElement[] {
   return Array.from(
-    (fixture.nativeElement as HTMLElement).querySelectorAll('g.keruc-seat'),
+    (fixture.nativeElement as HTMLElement).querySelectorAll('g.kerusi-seat'),
   ) as SVGGElement[];
 }
 
@@ -129,8 +129,8 @@ describe('SeatPickerComponent', () => {
 @Component({
   imports: [SeatPickerComponent],
   template: `
-    <keruc-seatpicker class="first" [rows]="firstRows()" />
-    <keruc-seatpicker class="second" [rows]="secondRows()" />
+    <kerusi-seatpicker class="first" [rows]="firstRows()" />
+    <kerusi-seatpicker class="second" [rows]="secondRows()" />
   `,
 })
 class TwoInstancesHost {
@@ -150,15 +150,15 @@ describe('SeatPickerComponent multi-instance (bug #3)', () => {
     const first = host.querySelector('.first')!;
     const second = host.querySelector('.second')!;
 
-    const firstSeat = first.querySelector('g.keruc-seat')!;
+    const firstSeat = first.querySelector('g.kerusi-seat')!;
     firstSeat.dispatchEvent(new MouseEvent('click'));
     fixture.detectChanges();
 
     expect(fixture.componentInstance.firstRows()[0].nodes[0].selected).toBe(SeatState.Selected);
     // the second instance is untouched
     expect(fixture.componentInstance.secondRows()[0].nodes[0].selected).toBe(SeatState.Vacant);
-    expect(second.querySelectorAll('g.keruc-seat')).toHaveLength(1);
-    expect(rectFill(second.querySelector('g.keruc-seat') as SVGGElement)).toBe(
+    expect(second.querySelectorAll('g.kerusi-seat')).toHaveLength(1);
+    expect(rectFill(second.querySelector('g.kerusi-seat') as SVGGElement)).toBe(
       DEFAULT_COLORS.vacantColourBg,
     );
   });
@@ -219,10 +219,10 @@ describe('SeatPickerComponent freeform rendering', () => {
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelectorAll('g.keruc-element')).toHaveLength(1);
-    expect(host.querySelector('g.keruc-element text')!.textContent).toContain('Screen');
+    expect(host.querySelectorAll('g.kerusi-element')).toHaveLength(1);
+    expect(host.querySelector('g.kerusi-element text')!.textContent).toContain('Screen');
 
-    const seatGroup = host.querySelector('g.keruc-seat')!;
+    const seatGroup = host.querySelector('g.kerusi-seat')!;
     expect(seatGroup.getAttribute('transform')).toMatch(/^rotate\(-8 /);
   });
 });

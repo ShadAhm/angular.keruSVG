@@ -11,7 +11,7 @@
     [attr.fill]="resolvedColors().backDropColour"
   />
   @for (element of computedLayout().elements; track $index) {
-    <g class="keruc-element" [attr.transform]="transform(element)">
+    <g class="kerusi-element" [attr.transform]="transform(element)">
       <rect
         rx="4"
         [attr.x]="element.x"
@@ -35,7 +35,7 @@
     </g>
   }
   @for (seat of computedLayout().seats; track seat.node) {
-    <g class="keruc-seat" [attr.transform]="transform(seat)" (click)="onSeatClick(seat)">
+    <g class="kerusi-seat" [attr.transform]="transform(seat)" (click)="onSeatClick(seat)">
       <rect
         [attr.x]="seat.x"
         [attr.y]="seat.y"

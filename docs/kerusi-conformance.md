@@ -5,7 +5,7 @@ implements, and which it does not.
 
 |               |                                                                                                                          |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Library       | `ngx-keruc-seatpicker` (this repository)                                                                                 |
+| Library       | `ngx-kerusi-seatmap` (this repository)                                                                                 |
 | Spec assessed | [Kerusi standard v1.0.0-draft, rev 8](https://github.com/ShadAhm/kerusi/blob/master/RFC/kerusi-standard_v1.0.0-draft.md) |
 | Date          | 2026-08-18                                                                                                               |
 

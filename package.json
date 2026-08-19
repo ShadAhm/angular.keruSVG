@@ -1,15 +1,15 @@
 {
-  "name": "kerusvg-ws",
+  "name": "ngx-kerusi-seatmap-ws",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
     "build": "ng build",
-    "build:lib": "ng build kerusvg",
+    "build:lib": "ng build ngx-kerusi-seatmap",
     "build:demo": "ng build demo",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:lib": "ng test kerusvg --watch=false",
+    "test:lib": "ng test ngx-kerusi-seatmap --watch=false",
     "test:demo": "ng test demo --watch=false",
     "test:ci": "npm run test:lib && npm run test:demo"
   },

@@ -1,5 +1,5 @@
 // LEGACY: original AngularJS 1.x directive (pre-rewrite), kept for reference only.
-// Superseded by the modern Angular library in projects/kerusvg (npm: ngx-keruc-seatpicker).
+// Superseded by the modern Angular library in projects/ngx-kerusi-seatmap (npm: ngx-kerusi-seatmap).
 "use strict";
 
 var f = function ($compile) {

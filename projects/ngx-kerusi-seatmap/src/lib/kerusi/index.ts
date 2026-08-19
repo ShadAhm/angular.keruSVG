@@ -1,5 +1,5 @@
 /**
- * Kerusi Seat Map & Availability Format support for ngx-keruc-seatpicker.
+ * Kerusi Seat Map & Availability Format support for ngx-kerusi-seatmap.
  *
  * Types, a validator, and an adapter that convert a `KerusiMap` + `KerusiState`
  * document pair into the grid `SeatRow[]` the seat-picker renders. See

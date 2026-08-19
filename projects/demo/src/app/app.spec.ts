@@ -18,7 +18,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('ngx-keruc-seatpicker');
-    expect(compiled.querySelectorAll('keruc-seatpicker').length).toBe(3);
+    expect(compiled.querySelector('h1')?.textContent).toContain('ngx-kerusi-seatmap');
+    expect(compiled.querySelectorAll('kerusi-seatpicker').length).toBe(3);
   });
 });

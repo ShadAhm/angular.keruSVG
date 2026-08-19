@@ -1,4 +1,4 @@
-import { adaptKerusiMap, Seat, validateKerusiMap } from 'ngx-keruc-seatpicker';
+import { adaptKerusiMap, Seat, validateKerusiMap } from 'ngx-kerusi-seatmap';
 import { CINEMA_KERUSI_MAP, CINEMA_KERUSI_STATE } from './cinema-kerusi.fixture';
 
 const seats = CINEMA_KERUSI_MAP.sections[0].seats;

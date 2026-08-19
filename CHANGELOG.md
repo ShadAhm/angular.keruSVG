@@ -46,7 +46,7 @@ AngularJS 1.x directive (kept in `legacy/`).
 
 ### Added
 
-- Standalone, signal-based `SeatPickerComponent` (`<keruc-seatpicker>`) that
+- Standalone, signal-based `SeatPickerComponent` (`<kerusi-seatpicker>`) that
   renders a seat map as inline SVG.
 - Typed data model: `NodeType`, `SeatState`, `SeatNode`, `SeatRow`, and
   `SeatPickerColors`.
@@ -65,4 +65,4 @@ Carried over from the legacy directive:
 - Rendering is per-instance (no global element id lookup), so multiple pickers
   can coexist on one page.
 
-[0.1.0]: https://github.com/ShadAhm/angular.keruSVG/releases/tag/v0.1.0
+[0.1.0]: https://github.com/ShadAhm/ngx-kerusi-seatmap/releases/tag/v0.1.0

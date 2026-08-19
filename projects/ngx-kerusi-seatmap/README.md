@@ -1,4 +1,4 @@
-# ngx-keruc-seatpicker
+# ngx-kerusi-seatmap
 
 An Angular seat-picker component that renders an interactive seat map as inline
 SVG. Standalone, signal-based, and dependency-free beyond Angular itself.
@@ -6,7 +6,7 @@ SVG. Standalone, signal-based, and dependency-free beyond Angular itself.
 ## Install
 
 ```bash
-npm install ngx-keruc-seatpicker
+npm install ngx-kerusi-seatmap
 ```
 
 Requires Angular 22+ (`@angular/core` and `@angular/common` as peer dependencies).
@@ -15,13 +15,13 @@ Requires Angular 22+ (`@angular/core` and `@angular/common` as peer dependencies
 
 ```ts
 import { Component, signal } from '@angular/core';
-import { NodeType, SeatNode, SeatRow, SeatState, SeatPickerComponent } from 'ngx-keruc-seatpicker';
+import { NodeType, SeatNode, SeatRow, SeatState, SeatPickerComponent } from 'ngx-kerusi-seatmap';
 
 @Component({
   selector: 'app-booking',
   imports: [SeatPickerComponent],
   template: `
-    <keruc-seatpicker
+    <kerusi-seatpicker
       [rows]="rows()"
       [canvasWidth]="560"
       [canvasHeight]="560"
@@ -100,9 +100,9 @@ Format**](../../docs/kerusi.md) document pair — a static `KerusiMap` plus a li
 `KerusiState` — and render it through the same component:
 
 ```ts
-import { SeatPickerComponent, kerusiToRows } from 'ngx-keruc-seatpicker';
+import { SeatPickerComponent, kerusiToRows } from 'ngx-kerusi-seatmap';
 
-// map + state are Kerusi documents; rows binds straight to <keruc-seatpicker>
+// map + state are Kerusi documents; rows binds straight to <kerusi-seatpicker>
 readonly rows = signal(kerusiToRows(map, state));
 ```
 

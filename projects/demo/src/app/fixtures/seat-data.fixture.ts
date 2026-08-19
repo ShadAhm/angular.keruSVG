@@ -1,4 +1,4 @@
-import { NodeType, SeatRow, SeatState } from 'ngx-keruc-seatpicker';
+import { NodeType, SeatRow, SeatState } from 'ngx-kerusi-seatmap';
 
 // 10x10 sample auditorium ported from the original gh-pages demo.
 export const SAMPLE_ROWS: SeatRow[] = [

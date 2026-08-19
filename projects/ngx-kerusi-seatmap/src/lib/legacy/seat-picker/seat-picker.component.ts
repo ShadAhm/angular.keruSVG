@@ -7,10 +7,21 @@ import { SeatNode } from '../models/seat-node.model';
 import { SeatRow } from '../models/seat-row.model';
 import { DEFAULT_COLORS, SeatPickerColors } from '../models/seat-picker-colors.model';
 
+/** @deprecated Legacy renderer mode. `<kerusi-seatmap>` resolves the mode per section. */
 export type SeatPickerLayout = 'grid' | 'freeform';
 
+/**
+ * The pre-1.0 grid renderer, kept for backward compatibility.
+ *
+ * @deprecated Use {@link KerusiSeatmapComponent} (`<kerusi-seatmap>`), which
+ * takes a `KerusiMap` + `KerusiState` directly, renders each `Section` as its
+ * own unit with its own layout mode and aspect ratio, colors seats from the
+ * map's legend, and is keyboard-navigable. This component flattens every
+ * section into one continuous row list and mutates `SeatNode.selected` in
+ * place. It will be removed no earlier than 2.0.
+ */
 @Component({
-  selector: 'keruc-seatpicker',
+  selector: 'kerusi-seatpicker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './seat-picker.component.html',
   styleUrl: './seat-picker.component.css',

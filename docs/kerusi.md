@@ -1,9 +1,9 @@
 # Kerusi format support
 
-`ngx-keruc-seatpicker` can consume a [**Kerusi Seat Map & Availability
-Format**](https://github.com/ShadAhm/angular.keruSVG) document pair — a static
+`ngx-kerusi-seatmap` can consume a [**Kerusi Seat Map & Availability
+Format**](https://github.com/ShadAhm/ngx-kerusi-seatmap) document pair — a static
 `KerusiMap` (layout, seat types, pricing) plus a live `KerusiState`
-(availability) — and render it through the existing `<keruc-seatpicker>`
+(availability) — and render it through the existing `<kerusi-seatpicker>`
 component with no renderer changes. This is an **additive** entry point; the
 native `rows`/`SeatRow[]` API is unchanged.
 
@@ -23,7 +23,7 @@ import {
   kerusiToRows,
   type KerusiMap,
   type KerusiState,
-} from 'ngx-keruc-seatpicker';
+} from 'ngx-kerusi-seatmap';
 
 const map: KerusiMap = {
   kerusi: '1.0',
@@ -54,7 +54,7 @@ const state: KerusiState = {
 @Component({
   selector: 'app-bus',
   imports: [SeatPickerComponent],
-  template: `<keruc-seatpicker [rows]="rows()" />`,
+  template: `<kerusi-seatpicker [rows]="rows()" />`,
 })
 export class BusComponent {
   // one line: adapt the Kerusi pair to the component's rows
@@ -75,7 +75,7 @@ price, attributes, or the originating section, use `adaptKerusiMap`, which
 returns both the rows and a parallel `AdaptedSeat[]`:
 
 ```ts
-import { adaptKerusiMap } from 'ngx-keruc-seatpicker';
+import { adaptKerusiMap } from 'ngx-kerusi-seatmap';
 
 const { rows, seats } = adaptKerusiMap(map, state);
 const seat = seats.find((s) => s.id === 'L1');
@@ -99,7 +99,7 @@ const { rows, elements, layout, aspectRatio } = adaptKerusiMap(map, state);
 ```
 
 ```html
-<keruc-seatpicker
+<kerusi-seatpicker
   [rows]="rows"
   [elements]="elements"
   [layout]="layout"
@@ -119,7 +119,7 @@ Blocked render in their own colors and are non-selectable. Override the mapping
 when you want to collapse or remap them:
 
 ```ts
-import { SeatState } from 'ngx-keruc-seatpicker';
+import { SeatState } from 'ngx-kerusi-seatmap';
 
 kerusiToRows(map, state, {
   statusMapping: (s) => (s === 'booked' ? SeatState.Occupied : SeatState.Vacant),

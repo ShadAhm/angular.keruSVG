@@ -1,6 +1,7 @@
 import { NodeType } from './node-type.enum';
 import { SeatState } from './seat-state.enum';
 
+/** @deprecated Legacy `SeatRow[]` renderer model. Use `RenderSeat`. */
 export interface SeatNode {
   type: NodeType;
   uniqueName?: string | null;

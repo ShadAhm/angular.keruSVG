@@ -1,7 +1,7 @@
-# angular.keruSVG
+# ngx-kerusi-seatmap
 
-[![CI](https://github.com/ShadAhm/angular.keruSVG/actions/workflows/ci.yml/badge.svg)](https://github.com/ShadAhm/angular.keruSVG/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/ngx-keruc-seatpicker.svg)](https://www.npmjs.com/package/ngx-keruc-seatpicker)
+[![CI](https://github.com/ShadAhm/ngx-kerusi-seatmap/actions/workflows/ci.yml/badge.svg)](https://github.com/ShadAhm/ngx-kerusi-seatmap/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/ngx-kerusi-seatmap.svg)](https://www.npmjs.com/package/ngx-kerusi-seatmap)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 An interactive **seat picker** for Angular, rendered as inline SVG. Give it rows
@@ -10,27 +10,27 @@ states and selection events.
 
 Originally a small AngularJS 1.x directive (since revived as a modern,
 standalone Angular library and published to npm as
-[`ngx-keruc-seatpicker`](https://www.npmjs.com/package/ngx-keruc-seatpicker)).
+[`ngx-kerusi-seatmap`](https://www.npmjs.com/package/ngx-kerusi-seatmap)).
 
-**[Live demo →](https://shadahm.github.io/angular.keruSVG/)**
+**[Live demo →](https://shadahm.github.io/ngx-kerusi-seatmap/)**
 
 ## Install
 
 ```bash
-npm install ngx-keruc-seatpicker
+npm install ngx-kerusi-seatmap
 ```
 
 ## Quick start
 
 ```ts
-import { SeatPickerComponent, NodeType, SeatState, SeatRow } from 'ngx-keruc-seatpicker';
+import { SeatPickerComponent, NodeType, SeatState, SeatRow } from 'ngx-kerusi-seatmap';
 
 // in a standalone component:
 imports: [SeatPickerComponent];
 ```
 
 ```html
-<keruc-seatpicker
+<kerusi-seatpicker
   [rows]="rows"
   (selected)="onSelected($event)"
   (deselected)="onDeselected($event)"
@@ -38,7 +38,7 @@ imports: [SeatPickerComponent];
 />
 ```
 
-See the [library README](projects/kerusvg/README.md) for the full API (inputs,
+See the [library README](projects/ngx-kerusi-seatmap/README.md) for the full API (inputs,
 outputs, data model, and color configuration).
 
 It can also consume the vendor-neutral **Kerusi Seat Map & Availability Format**
@@ -49,9 +49,9 @@ It can also consume the vendor-neutral **Kerusi Seat Map & Availability Format**
 
 | Path                        | What it is                                                |
 | --------------------------- | --------------------------------------------------------- |
-| `projects/kerusvg/`         | The publishable library (`ngx-keruc-seatpicker`).         |
+| `projects/ngx-kerusi-seatmap/`         | The publishable library (`ngx-kerusi-seatmap`).         |
 | `projects/demo/`            | Demo app, deployed to GitHub Pages.                       |
-| `legacy/angular.keruSVG.js` | The original AngularJS 1.x directive, kept for reference. |
+| `legacy/original-angularjs-directive.js` | The original AngularJS 1.x directive, kept for reference. |
 
 ## Develop
 
@@ -59,16 +59,16 @@ It can also consume the vendor-neutral **Kerusi Seat Map & Availability Format**
 npm install
 npm start          # serve the demo at http://localhost:4200
 npm run test:ci    # run library + demo unit tests
-npm run build:lib  # build the library into dist/ngx-keruc-seatpicker
+npm run build:lib  # build the library into dist/ngx-kerusi-seatmap
 ```
 
 ## Publishing
 
 Releases are cut manually (CI never publishes to npm):
 
-1. Bump `version` in `projects/kerusvg/package.json` and add a `CHANGELOG.md` entry.
+1. Bump `version` in `projects/ngx-kerusi-seatmap/package.json` and add a `CHANGELOG.md` entry.
 2. `npm run build:lib`
-3. `cd dist/ngx-keruc-seatpicker && npm publish --access public` (add `--dry-run` first to inspect contents).
+3. `cd dist/ngx-kerusi-seatmap && npm publish --access public` (add `--dry-run` first to inspect contents).
 4. `git tag vX.Y.Z && git push --tags`, then cut a GitHub Release from the tag.
 
 ## License

@@ -1,5 +1,5 @@
 <header class="site-header">
-  <h1>ngx-keruc-seatpicker</h1>
+  <h1>ngx-kerusi-seatmap</h1>
   <p>An interactive seat map rendered as inline SVG, for modern Angular.</p>
 </header>
 
@@ -10,7 +10,7 @@
       <p class="hint">
         The core component: a grid of rows and nodes, with spacers holding the aisles open.
       </p>
-      <keruc-seatpicker
+      <kerusi-seatpicker
         [rows]="rows()"
         [canvasWidth]="560"
         [canvasHeight]="560"
@@ -80,7 +80,7 @@
           held and blocked seats are all distinct and unselectable.
         </p>
 
-        <keruc-seatpicker
+        <kerusi-seatpicker
           [rows]="cinemaRows()"
           [elements]="cinemaElements()"
           [layout]="cinemaLayout"
@@ -125,7 +125,7 @@
           Two pickers on one page stay fully independent &mdash; clicking here never touches the
           auditorium above.
         </p>
-        <keruc-seatpicker
+        <kerusi-seatpicker
           [rows]="compactRows()"
           [colors]="compactColors"
           [canvasWidth]="260"
@@ -137,7 +137,7 @@
 </main>
 
 <footer class="site-footer">
-  <a href="https://github.com/ShadAhm/angular.keruSVG">GitHub</a>
+  <a href="https://github.com/ShadAhm/ngx-kerusi-seatmap">GitHub</a>
   <span>&middot;</span>
-  <a href="https://www.npmjs.com/package/ngx-keruc-seatpicker">npm</a>
+  <a href="https://www.npmjs.com/package/ngx-kerusi-seatmap">npm</a>
 </footer>

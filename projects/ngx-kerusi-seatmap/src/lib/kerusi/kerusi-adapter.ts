@@ -1,8 +1,8 @@
-import { NodeType } from '../models/node-type.enum';
-import { SeatElement } from '../models/seat-element.model';
-import { SeatNode } from '../models/seat-node.model';
-import { SeatRow } from '../models/seat-row.model';
-import { SeatState } from '../models/seat-state.enum';
+import { NodeType } from '../legacy/models/node-type.enum';
+import { SeatElement } from '../legacy/models/seat-element.model';
+import { SeatNode } from '../legacy/models/seat-node.model';
+import { SeatRow } from '../legacy/models/seat-row.model';
+import { SeatState } from '../legacy/models/seat-state.enum';
 import { Element, KerusiMap, Money, RowMeta, Seat, Section } from './kerusi-map.model';
 import { KerusiState, KerusiStateDelta, SeatStatus } from './kerusi-state.model';
 import { resolveSeatPrice } from './kerusi-price';
@@ -72,7 +72,7 @@ export interface AdaptedSeat {
 }
 
 export interface AdaptResult {
-  /** Ready to bind to `<keruc-seatpicker [rows]="...">`. */
+  /** Ready to bind to `<kerusi-seatpicker [rows]="...">`. */
   rows: SeatRow[];
   /** Rich per-seat data keyed positionally to `rows`; see {@link AdaptedSeat}. */
   seats: AdaptedSeat[];

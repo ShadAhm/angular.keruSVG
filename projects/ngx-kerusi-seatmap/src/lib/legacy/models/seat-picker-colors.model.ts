@@ -1,3 +1,4 @@
+/** @deprecated Legacy renderer theming. Use `KerusiSeatmapColors`. */
 export interface SeatPickerColors {
   vacantColourBg?: string;
   vacantColourFg?: string;

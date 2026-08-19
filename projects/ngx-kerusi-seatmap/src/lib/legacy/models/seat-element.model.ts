@@ -5,6 +5,7 @@
  * canvas, matching {@link SeatNode} freeform coordinates, and are used only by
  * the freeform layout.
  */
+/** @deprecated Legacy renderer model. Use `RenderElement`. */
 export interface SeatElement {
   /** Free-text kind, e.g. "screen" | "stage" | "exit". Informational. */
   kind: string;
