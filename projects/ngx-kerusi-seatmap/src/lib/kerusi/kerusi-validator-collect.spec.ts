@@ -100,9 +100,9 @@ describe('version negotiation', () => {
         (v) => v.rule,
       ),
     ).toContain('delta-version-unsupported');
-    expect(
-      checkKerusiSession({ kerusi: '3.0', id: 's', mapId: 'm' }).map((v) => v.rule),
-    ).toContain('session-version-unsupported');
+    expect(checkKerusiSession({ kerusi: '3.0', id: 's', mapId: 'm' }).map((v) => v.rule)).toContain(
+      'session-version-unsupported',
+    );
   });
 });
 

@@ -17,7 +17,10 @@
 
   <!-- Elements first, so a screen or stage sits behind the seats it faces. -->
   @for (placed of layout().elements; track placed.element.id) {
-    <g class="kerusi-element kerusi-element--{{ placed.element.kind }}" [attr.transform]="transform(placed)">
+    <g
+      class="kerusi-element kerusi-element--{{ placed.element.kind }}"
+      [attr.transform]="transform(placed)"
+    >
       @switch (style(placed).shape) {
         @case ('screen') {
           <path [attr.d]="screenPathOf(placed)" [attr.fill]="elementFillOf(placed)" />

@@ -39,11 +39,19 @@
           </select>
         </label>
         <label class="toggle">
-          <input type="checkbox" [checked]="typeColors()" (change)="typeColors.set($any($event.target).checked)" />
+          <input
+            type="checkbox"
+            [checked]="typeColors()"
+            (change)="typeColors.set($any($event.target).checked)"
+          />
           Seat-type colours
         </label>
         <label class="toggle">
-          <input type="checkbox" [checked]="showLegend()" (change)="showLegend.set($any($event.target).checked)" />
+          <input
+            type="checkbox"
+            [checked]="showLegend()"
+            (change)="showLegend.set($any($event.target).checked)"
+          />
           Legend
         </label>
       </div>

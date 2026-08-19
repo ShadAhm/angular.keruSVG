@@ -28,9 +28,7 @@ describe('seatAriaLabel', () => {
   it('leads with the position, then type, price and status', () => {
     // Intl separates the currency code from the amount with U+00A0, so match
     // on the parts rather than a literal that depends on which space it used.
-    expect(labelFor(BASE)).toMatch(
-      /^Row 12, seat A, Business class, MYR.450\.00, available\.$/,
-    );
+    expect(labelFor(BASE)).toMatch(/^Row 12, seat A, Business class, MYR.450\.00, available\.$/);
   });
 
   it('omits the row when the seat has none', () => {
@@ -112,7 +110,9 @@ describe('disallowedAnnouncement', () => {
     expect(disallowedAnnouncement(seat(), 'held')).toBe(
       'Row 12, seat A is held by another customer.',
     );
-    expect(disallowedAnnouncement(seat(), 'max-selection')).toContain('would exceed the seat limit');
+    expect(disallowedAnnouncement(seat(), 'max-selection')).toContain(
+      'would exceed the seat limit',
+    );
     expect(disallowedAnnouncement(seat(), 'companion-unavailable')).toContain(
       'must be booked with a seat that is unavailable',
     );

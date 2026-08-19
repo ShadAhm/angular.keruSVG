@@ -168,10 +168,7 @@ export interface SelectionSummary {
  * minor-unit exponent via `formatMoney`; it is returned as `Money`, in minor
  * units, so no precision is lost on the way out.
  */
-export function summarizeSelection(
-  map: RenderMap,
-  selection: readonly string[],
-): SelectionSummary {
+export function summarizeSelection(map: RenderMap, selection: readonly string[]): SelectionSummary {
   const selected = new Set(selection);
   const seats = [...map.seatsById.values()].filter((seat) => selected.has(seat.id));
   const prices = seats.map((s) => s.price).filter((p): p is Money => p !== undefined);

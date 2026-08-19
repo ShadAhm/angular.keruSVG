@@ -57,10 +57,30 @@ export const AIRCRAFT_MAP: KerusiMap = {
   domain: 'flight',
   locale: 'en',
   legend: [
-    { id: 'business', label: { en: 'Business', ms: 'Perniagaan' }, color: '#2f6f9f', defaultPriceTier: 'biz' },
-    { id: 'economy-plus', label: { en: 'Economy Plus', ms: 'Ekonomi Plus' }, color: '#3f8f76', defaultPriceTier: 'plus' },
-    { id: 'economy', label: { en: 'Economy', ms: 'Ekonomi' }, color: '#5f9f52', defaultPriceTier: 'eco' },
-    { id: 'accessible', label: { en: 'Accessible', ms: 'Boleh Diakses' }, color: '#c78a2e', defaultPriceTier: 'eco' },
+    {
+      id: 'business',
+      label: { en: 'Business', ms: 'Perniagaan' },
+      color: '#2f6f9f',
+      defaultPriceTier: 'biz',
+    },
+    {
+      id: 'economy-plus',
+      label: { en: 'Economy Plus', ms: 'Ekonomi Plus' },
+      color: '#3f8f76',
+      defaultPriceTier: 'plus',
+    },
+    {
+      id: 'economy',
+      label: { en: 'Economy', ms: 'Ekonomi' },
+      color: '#5f9f52',
+      defaultPriceTier: 'eco',
+    },
+    {
+      id: 'accessible',
+      label: { en: 'Accessible', ms: 'Boleh Diakses' },
+      color: '#c78a2e',
+      defaultPriceTier: 'eco',
+    },
   ],
   priceTiers: [
     { id: 'biz', label: 'Business', price: { amount: 128000, currency: 'MYR' } },

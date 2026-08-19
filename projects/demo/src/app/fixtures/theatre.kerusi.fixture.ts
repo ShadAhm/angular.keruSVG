@@ -48,9 +48,24 @@ export const THEATRE_MAP: KerusiMap = {
   domain: 'theatre',
   locale: 'en',
   legend: [
-    { id: 'stalls', label: { en: 'Orchestra', ms: 'Orkestra' }, color: '#8f4a6b', defaultPriceTier: 'a' },
-    { id: 'mezz', label: { en: 'Mezzanine', ms: 'Mezanin' }, color: '#4a6b8f', defaultPriceTier: 'b' },
-    { id: 'balcony', label: { en: 'Balcony', ms: 'Balkoni' }, color: '#4a8f6b', defaultPriceTier: 'c' },
+    {
+      id: 'stalls',
+      label: { en: 'Orchestra', ms: 'Orkestra' },
+      color: '#8f4a6b',
+      defaultPriceTier: 'a',
+    },
+    {
+      id: 'mezz',
+      label: { en: 'Mezzanine', ms: 'Mezanin' },
+      color: '#4a6b8f',
+      defaultPriceTier: 'b',
+    },
+    {
+      id: 'balcony',
+      label: { en: 'Balcony', ms: 'Balkoni' },
+      color: '#4a8f6b',
+      defaultPriceTier: 'c',
+    },
     { id: 'box', label: { en: 'Box', ms: 'Kotak' }, color: '#8f7a3a', defaultPriceTier: 'box' },
   ],
   priceTiers: [
@@ -72,7 +87,9 @@ export const THEATRE_MAP: KerusiMap = {
         { id: 'C', label: 'C', index: 2 },
         { id: 'D', label: 'D', index: 3 },
       ],
-      elements: [{ id: 'stage', kind: 'stage', label: 'STAGE', x: 50, y: 10, width: 58, height: 10 }],
+      elements: [
+        { id: 'stage', kind: 'stage', label: 'STAGE', x: 50, y: 10, width: 58, height: 10 },
+      ],
       seats: [
         ...curvedRow('A', 16, 42, 'stalls'),
         ...curvedRow('B', 18, 58, 'stalls'),
@@ -120,7 +137,9 @@ export const THEATRE_MAP: KerusiMap = {
         { id: 'BXR1', label: 'R1', row: 'BX', col: 7, type: 'box' },
         { id: 'BXR2', label: 'R2', row: 'BX', col: 8, type: 'box' },
       ],
-      elements: [{ id: 'box-gap', kind: 'gap', label: 'Auditorium below', row: 'BX', col: 3, width: 4 }],
+      elements: [
+        { id: 'box-gap', kind: 'gap', label: 'Auditorium below', row: 'BX', col: 3, width: 4 },
+      ],
     },
   ],
 };

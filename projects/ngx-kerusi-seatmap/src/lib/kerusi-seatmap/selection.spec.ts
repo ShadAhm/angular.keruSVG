@@ -8,7 +8,10 @@ import { companionClosure, summarizeSelection, toggleSeatSelection } from './sel
 const MAP: KerusiMap = {
   kerusi: '1.0',
   id: 'm',
-  legend: [{ id: 'standard', defaultPriceTier: 'base' }, { id: 'sofa', defaultPriceTier: 'top' }],
+  legend: [
+    { id: 'standard', defaultPriceTier: 'base' },
+    { id: 'sofa', defaultPriceTier: 'top' },
+  ],
   priceTiers: [
     { id: 'base', price: { amount: 1500, currency: 'MYR' } },
     { id: 'top', price: { amount: 4500, currency: 'MYR' } },
@@ -86,7 +89,11 @@ describe('toggleSeatSelection', () => {
   });
 
   it('leaves companions alone in independent mode', () => {
-    const result = toggleSeatSelection([], 'L1', ctxFor(undefined, { companionMode: 'independent' }));
+    const result = toggleSeatSelection(
+      [],
+      'L1',
+      ctxFor(undefined, { companionMode: 'independent' }),
+    );
     expect(result.selection).toEqual(['L1']);
   });
 

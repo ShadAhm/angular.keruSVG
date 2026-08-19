@@ -124,7 +124,9 @@ describe('freeform layout', () => {
       { id: 'A1', x: 25, y: 50, rotation: -8, type: 'standard' },
       { id: 'A2', x: 75, y: 50, type: 'standard' },
     ],
-    elements: [{ id: 'screen', kind: 'screen', label: 'Screen', x: 50, y: 10, width: 60, height: 5 }],
+    elements: [
+      { id: 'screen', kind: 'screen', label: 'Screen', x: 50, y: 10, width: 60, height: 5 },
+    ],
   }).sections[0];
 
   it('derives the viewBox height from the section aspect ratio', () => {

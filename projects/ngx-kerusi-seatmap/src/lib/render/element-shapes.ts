@@ -53,12 +53,7 @@ export function elementStyle(kind: string): ElementStyle {
  * downward toward the seats. Drawn as a filled sliver rather than a stroke so
  * it reads at any size.
  */
-export function screenPath(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): string {
+export function screenPath(x: number, y: number, width: number, height: number): string {
   const bulge = height * 1.6;
   return (
     `M ${x} ${y} ` +

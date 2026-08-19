@@ -152,7 +152,10 @@ function freeformBands(section: RenderSection): NavSeat[][] {
 }
 
 /** The seat in `band` whose ordinal is closest to `from`'s — vertical movement. */
-function nearest(band: NavSeat[] | undefined, from: NavSeat | { ordinal: number }): string | undefined {
+function nearest(
+  band: NavSeat[] | undefined,
+  from: NavSeat | { ordinal: number },
+): string | undefined {
   if (!band || band.length === 0) {
     return undefined;
   }

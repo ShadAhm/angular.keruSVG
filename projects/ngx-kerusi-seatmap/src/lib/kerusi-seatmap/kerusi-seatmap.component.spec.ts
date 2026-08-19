@@ -97,7 +97,9 @@ describe('KerusiSeatmapComponent', () => {
     });
 
     it('gives each section its own viewBox from its own layout mode', () => {
-      const [stalls, balcony] = svgs().map((s) => s.getAttribute('viewBox')!.split(' ').map(Number));
+      const [stalls, balcony] = svgs().map((s) =>
+        s.getAttribute('viewBox')!.split(' ').map(Number),
+      );
       // The freeform balcony is 3:1; the grid stalls are sized from their cells.
       expect(balcony[2] / balcony[3]).toBeCloseTo(3, 5);
       expect(stalls[2] / stalls[3]).not.toBeCloseTo(3, 5);

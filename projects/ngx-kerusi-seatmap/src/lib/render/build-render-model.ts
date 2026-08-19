@@ -54,9 +54,7 @@ export function buildRenderModel(
   options: BuildRenderModelOptions = {},
 ): RenderMap {
   const locale = resolveMapLocale(map, options.locale);
-  const selectableStatuses = new Set(
-    options.selectableStatuses ?? DEFAULT_SELECTABLE_STATUSES,
-  );
+  const selectableStatuses = new Set(options.selectableStatuses ?? DEFAULT_SELECTABLE_STATUSES);
   const legendById = new Map((map.legend ?? []).map((t) => [t.id, t]));
   const seatsById = new Map<string, RenderSeat>();
   const typeCounts = new Map<string, number>();
@@ -240,8 +238,7 @@ function buildSeat(
   };
 
   rendered.selectable =
-    ctx.selectableStatuses.has(rendered.status) &&
-    (ctx.seatSelectable?.(rendered) ?? true);
+    ctx.selectableStatuses.has(rendered.status) && (ctx.seatSelectable?.(rendered) ?? true);
 
   ctx.seatsById.set(rendered.id, rendered);
   return rendered;

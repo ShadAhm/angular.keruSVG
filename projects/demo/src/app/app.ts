@@ -81,9 +81,7 @@ export class App {
   });
 
   /** The scenario's map as JSON, so the standard itself is visible on the page. */
-  protected readonly sourceJson = computed(() =>
-    JSON.stringify(this.scenario().map, null, 2),
-  );
+  protected readonly sourceJson = computed(() => JSON.stringify(this.scenario().map, null, 2));
 
   protected readonly sectionSummary = computed(() =>
     buildRenderModel(this.scenario().map, this.scenario().state).sections.map((section) => ({

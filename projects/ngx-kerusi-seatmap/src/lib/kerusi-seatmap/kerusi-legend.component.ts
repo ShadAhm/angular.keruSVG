@@ -1,11 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { formatMoney } from '../kerusi/kerusi-locale';
 import { RenderLegendEntry } from '../render/render-model';
-import {
-  DEFAULT_KERUSI_COLORS,
-  KerusiSeatmapColors,
-  readableOn,
-} from './kerusi-seatmap-colors';
+import { DEFAULT_KERUSI_COLORS, KerusiSeatmapColors, readableOn } from './kerusi-seatmap-colors';
 
 /** One availability swatch in the legend's second block. */
 interface StatusEntry {

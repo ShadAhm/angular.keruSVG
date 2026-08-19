@@ -4,13 +4,15 @@
 [![npm](https://img.shields.io/npm/v/ngx-kerusi-seatmap.svg)](https://www.npmjs.com/package/ngx-kerusi-seatmap)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-An interactive **seat picker** for Angular, rendered as inline SVG. Give it rows
-of seats and it draws a clickable seat map with vacant / occupied / selected
-states and selection events.
+An Angular seat map that renders the **[Kerusi Seat Map & Availability
+Format](https://github.com/ShadAhm/kerusi)** directly as inline SVG — cinemas,
+aircraft, theatres, stadiums, coaches, trains — with keyboard navigation and
+screen-reader support built in.
 
-Originally a small AngularJS 1.x directive (since revived as a modern,
-standalone Angular library and published to npm as
-[`ngx-kerusi-seatmap`](https://www.npmjs.com/package/ngx-kerusi-seatmap)).
+Give it a `KerusiMap` and a `KerusiState` and it draws the venue: each `Section`
+in its own layout mode with its own proportions, seats coloured from the map's
+legend, prices resolved through the standard's precedence order, and companion
+seats booked as a unit.
 
 **[Live demo →](https://shadahm.github.io/ngx-kerusi-seatmap/)**
 
@@ -23,34 +25,75 @@ npm install ngx-kerusi-seatmap
 ## Quick start
 
 ```ts
-import { SeatPickerComponent, NodeType, SeatState, SeatRow } from 'ngx-kerusi-seatmap';
+import { Component, signal } from '@angular/core';
+import { KerusiSeatmapComponent, type KerusiMap, type KerusiState } from 'ngx-kerusi-seatmap';
 
-// in a standalone component:
-imports: [SeatPickerComponent];
+const map: KerusiMap = {
+  kerusi: '1.0',
+  id: 'bus-42',
+  domain: 'bus',
+  legend: [{ id: 'standard', label: 'Standard' }],
+  sections: [
+    {
+      id: 'main',
+      seats: [
+        { id: '1A', row: '1', col: 1, type: 'standard' },
+        { id: '1B', row: '1', col: 2, type: 'standard' },
+        // Column 3 is omitted — that gap is the aisle. No filler seat needed.
+        { id: '1C', row: '1', col: 4, type: 'standard' },
+        { id: '1D', row: '1', col: 5, type: 'standard' },
+      ],
+    },
+  ],
+};
+
+const state: KerusiState = {
+  kerusi: '1.0',
+  mapId: 'bus-42',
+  updatedAt: '2026-08-19T09:14:00Z',
+  seats: { '1A': { status: 'booked' } }, // everything else is available
+};
+
+@Component({
+  selector: 'app-bus',
+  imports: [KerusiSeatmapComponent],
+  template: `<kerusi-seatmap [map]="map" [state]="state" [(selection)]="picked" />`,
+})
+export class BusComponent {
+  protected readonly map = map;
+  protected readonly state = state;
+  protected readonly picked = signal<readonly string[]>([]);
+}
 ```
 
-```html
-<kerusi-seatpicker
-  [rows]="rows"
-  (selected)="onSelected($event)"
-  (deselected)="onDeselected($event)"
-  (disallowedSelected)="onDisallowed($event)"
-/>
-```
+`selection` is a plain list of seat ids. Nothing is mutated, so it works with
+`OnPush`, signals, or any store you already have.
 
-See the [library README](projects/ngx-kerusi-seatmap/README.md) for the full API (inputs,
-outputs, data model, and color configuration).
+See the [library README](projects/ngx-kerusi-seatmap/README.md) for the full API,
+and [docs/kerusi.md](docs/kerusi.md) for a tour of what the format can express.
 
-It can also consume the vendor-neutral **Kerusi Seat Map & Availability Format**
-(a `KerusiMap` + `KerusiState` pair) via a validating adapter — see
-[docs/kerusi.md](docs/kerusi.md), with a feature-by-feature audit in [docs/kerusi-conformance.md](docs/kerusi-conformance.md).
+## What it supports
+
+The library is a conformant Kerusi consumer. [docs/kerusi-conformance.md](docs/kerusi-conformance.md)
+is a feature-by-feature audit; the highlights:
+
+|                                     |                                                                                                                                                             |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **All three positioning modes**     | `grid`, `freeform` (percentage coordinates and per-seat rotation) and `mixed`, validated strictly per §4.5 and inferred when a section omits `layout`.      |
+| **Sections as render units**        | Each `Section` is its own `<svg>` with its own layout mode, aspect ratio and heading — a freeform orchestra and a grid balcony coexist in one map.          |
+| **The document drives the picture** | `SeatType.color`, price tiers, attributes and `Element.kind` all affect what is drawn.                                                                      |
+| **Accessibility**                   | Roving tabindex, arrow keys that follow the §4.3.1 `col` order, and seats announced with their type, price, status and every §4.3.4 accessibility property. |
+| **Companions**                      | `companions` closures book and release together, and a pair whose other half is sold is refused rather than half-taken.                                     |
+| **Live availability**               | `KerusiStateStore` applies deltas in order, discards stale and out-of-scope ones, and reverts lapsed holds.                                                 |
+| **Validation**                      | Every MUST-level rule, throwing or collecting, with a rule slug and document path per violation.                                                            |
 
 ## Repository layout
 
-| Path                        | What it is                                                |
-| --------------------------- | --------------------------------------------------------- |
-| `projects/ngx-kerusi-seatmap/`         | The publishable library (`ngx-kerusi-seatmap`).         |
-| `projects/demo/`            | Demo app, deployed to GitHub Pages.                       |
+| Path                                     | What it is                                                |
+| ---------------------------------------- | --------------------------------------------------------- |
+| `projects/ngx-kerusi-seatmap/`           | The publishable library.                                  |
+| `projects/demo/`                         | Demo app, deployed to GitHub Pages.                       |
+| `docs/`                                  | Format guide and the conformance report.                  |
 | `legacy/original-angularjs-directive.js` | The original AngularJS 1.x directive, kept for reference. |
 
 ## Develop
@@ -70,6 +113,14 @@ Releases are cut manually (CI never publishes to npm):
 2. `npm run build:lib`
 3. `cd dist/ngx-kerusi-seatmap && npm publish --access public` (add `--dry-run` first to inspect contents).
 4. `git tag vX.Y.Z && git push --tags`, then cut a GitHub Release from the tag.
+
+## History
+
+This began as a small AngularJS 1.x directive called `keruSVG`, revived as a
+modern standalone Angular library. Version 1.0 renamed it to
+`ngx-kerusi-seatmap` and rebuilt it around the Kerusi format; the pre-1.0
+`<kerusi-seatpicker>` and its `SeatRow[]` model are deprecated but still work.
+See [CHANGELOG.md](CHANGELOG.md) for the migration.
 
 ## License
 

@@ -22,8 +22,18 @@ export const COACH_MAP: KerusiMap = {
   domain: 'bus',
   locale: 'en',
   legend: [
-    { id: 'sleeper', label: { en: 'Sleeper', ms: 'Katil' }, color: '#5f6f9f', defaultPriceTier: 'standard' },
-    { id: 'front', label: { en: 'Front row', ms: 'Baris Depan' }, color: '#9f7f4f', defaultPriceTier: 'front' },
+    {
+      id: 'sleeper',
+      label: { en: 'Sleeper', ms: 'Katil' },
+      color: '#5f6f9f',
+      defaultPriceTier: 'standard',
+    },
+    {
+      id: 'front',
+      label: { en: 'Front row', ms: 'Baris Depan' },
+      color: '#9f7f4f',
+      defaultPriceTier: 'front',
+    },
   ],
   priceTiers: [
     { id: 'standard', label: 'Standard', price: { amount: 8000, currency: 'MYR' } },

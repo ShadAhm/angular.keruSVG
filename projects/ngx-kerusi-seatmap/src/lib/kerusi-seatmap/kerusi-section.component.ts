@@ -59,9 +59,7 @@ export class KerusiSectionComponent {
   readonly seatFocused = output<string>();
   readonly seatKeydown = output<KeyboardEvent>();
 
-  protected readonly viewBox = computed(
-    () => `0 0 ${this.layout().width} ${this.layout().height}`,
-  );
+  protected readonly viewBox = computed(() => `0 0 ${this.layout().width} ${this.layout().height}`);
 
   /** The section's natural width in CSS pixels; it never draws wider. */
   protected readonly naturalWidth = computed(() => this.layout().width * this.unitScale());

@@ -111,9 +111,7 @@ export function seatTextFill(
     case 'held':
       return colors.heldFg;
     default:
-      return useTypeColors && seat.typeColor
-        ? readableOn(seat.typeColor)
-        : colors.availableFg;
+      return useTypeColors && seat.typeColor ? readableOn(seat.typeColor) : colors.availableFg;
   }
 }
 

@@ -57,9 +57,24 @@ export const STADIUM_MAP: KerusiMap = {
   domain: 'stadium',
   locale: 'en',
   legend: [
-    { id: 'main', label: { en: 'Main Stand', ms: 'Pentas Utama' }, color: '#8f3a3a', defaultPriceTier: 'cat1' },
-    { id: 'side', label: { en: 'Side Stand', ms: 'Pentas Tepi' }, color: '#3a5f8f', defaultPriceTier: 'cat2' },
-    { id: 'end', label: { en: 'End Stand', ms: 'Pentas Hujung' }, color: '#3a8f5f', defaultPriceTier: 'cat3' },
+    {
+      id: 'main',
+      label: { en: 'Main Stand', ms: 'Pentas Utama' },
+      color: '#8f3a3a',
+      defaultPriceTier: 'cat1',
+    },
+    {
+      id: 'side',
+      label: { en: 'Side Stand', ms: 'Pentas Tepi' },
+      color: '#3a5f8f',
+      defaultPriceTier: 'cat2',
+    },
+    {
+      id: 'end',
+      label: { en: 'End Stand', ms: 'Pentas Hujung' },
+      color: '#3a8f5f',
+      defaultPriceTier: 'cat3',
+    },
   ],
   priceTiers: [
     { id: 'cat1', label: 'Category 1', price: { amount: 25000, currency: 'MYR' } },

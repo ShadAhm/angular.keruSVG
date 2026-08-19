@@ -29,11 +29,7 @@ import {
   SeatAriaStrings,
   seatAriaLabel,
 } from './seat-aria';
-import {
-  DisallowedReason,
-  summarizeSelection,
-  toggleSeatSelection,
-} from './selection';
+import { DisallowedReason, summarizeSelection, toggleSeatSelection } from './selection';
 
 /** How a document with validation errors is handled. */
 export type ValidationMode =
@@ -225,7 +221,10 @@ export class KerusiSeatmapComponent {
       if (!this.expireHolds()) {
         return;
       }
-      const handle = setInterval(() => this.expiryTick.update((n) => n + 1), this.expiryIntervalMs());
+      const handle = setInterval(
+        () => this.expiryTick.update((n) => n + 1),
+        this.expiryIntervalMs(),
+      );
       onCleanup(() => clearInterval(handle));
     });
   }

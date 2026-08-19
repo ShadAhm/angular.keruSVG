@@ -192,10 +192,7 @@ export class KerusiStateStore {
   private readonly sequenceOf: SequenceReader;
   private lastSequence: number | undefined;
 
-  constructor(
-    initial: KerusiState,
-    opts: { now?: () => Date; sequenceOf?: SequenceReader } = {},
-  ) {
+  constructor(initial: KerusiState, opts: { now?: () => Date; sequenceOf?: SequenceReader } = {}) {
     this._state = signal(initial);
     this.clock = opts.now ?? (() => new Date());
     this.sequenceOf = opts.sequenceOf ?? DEFAULT_SEQUENCE_READER;

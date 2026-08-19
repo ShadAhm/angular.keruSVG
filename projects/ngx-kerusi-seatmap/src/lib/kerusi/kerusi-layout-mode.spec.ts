@@ -35,20 +35,70 @@ describe('§4.5 declared layout modes are strict constraints', () => {
     expected: string[];
   }[] = [
     // grid
-    { name: 'grid: every seat has col, none has x/y', layout: 'grid', seats: [gridSeat('A1', 1), gridSeat('A2', 2)], expected: [] },
-    { name: 'grid: a seat missing col', layout: 'grid', seats: [gridSeat('A1', 1), { id: 'A2', type: 'standard' } as Seat], expected: ['section-layout-grid'] },
-    { name: 'grid: a seat carrying x/y', layout: 'grid', seats: [gridSeat('A1', 1), mixedSeat('A2', 2, 10, 10)], expected: ['section-layout-grid'] },
-    { name: 'grid: a seat carrying only x', layout: 'grid', seats: [{ id: 'A1', col: 1, x: 10, type: 'standard' }], expected: ['section-layout-grid'] },
+    {
+      name: 'grid: every seat has col, none has x/y',
+      layout: 'grid',
+      seats: [gridSeat('A1', 1), gridSeat('A2', 2)],
+      expected: [],
+    },
+    {
+      name: 'grid: a seat missing col',
+      layout: 'grid',
+      seats: [gridSeat('A1', 1), { id: 'A2', type: 'standard' } as Seat],
+      expected: ['section-layout-grid'],
+    },
+    {
+      name: 'grid: a seat carrying x/y',
+      layout: 'grid',
+      seats: [gridSeat('A1', 1), mixedSeat('A2', 2, 10, 10)],
+      expected: ['section-layout-grid'],
+    },
+    {
+      name: 'grid: a seat carrying only x',
+      layout: 'grid',
+      seats: [{ id: 'A1', col: 1, x: 10, type: 'standard' }],
+      expected: ['section-layout-grid'],
+    },
 
     // freeform
-    { name: 'freeform: every seat has x and y, none has col', layout: 'freeform', seats: [freeSeat('A1', 10, 10), freeSeat('A2', 20, 10)], expected: [] },
-    { name: 'freeform: a seat missing y', layout: 'freeform', seats: [{ id: 'A1', x: 10, type: 'standard' } as Seat], expected: ['section-layout-freeform'] },
-    { name: 'freeform: a seat carrying col', layout: 'freeform', seats: [mixedSeat('A1', 1, 10, 10)], expected: ['section-layout-freeform'] },
+    {
+      name: 'freeform: every seat has x and y, none has col',
+      layout: 'freeform',
+      seats: [freeSeat('A1', 10, 10), freeSeat('A2', 20, 10)],
+      expected: [],
+    },
+    {
+      name: 'freeform: a seat missing y',
+      layout: 'freeform',
+      seats: [{ id: 'A1', x: 10, type: 'standard' } as Seat],
+      expected: ['section-layout-freeform'],
+    },
+    {
+      name: 'freeform: a seat carrying col',
+      layout: 'freeform',
+      seats: [mixedSeat('A1', 1, 10, 10)],
+      expected: ['section-layout-freeform'],
+    },
 
     // mixed
-    { name: 'mixed: every seat has col, x and y', layout: 'mixed', seats: [mixedSeat('A1', 1, 10, 10), mixedSeat('A2', 2, 20, 10)], expected: [] },
-    { name: 'mixed: a seat missing col', layout: 'mixed', seats: [freeSeat('A1', 10, 10)], expected: ['section-layout-mixed'] },
-    { name: 'mixed: a seat missing x/y', layout: 'mixed', seats: [gridSeat('A1', 1)], expected: ['section-layout-mixed'] },
+    {
+      name: 'mixed: every seat has col, x and y',
+      layout: 'mixed',
+      seats: [mixedSeat('A1', 1, 10, 10), mixedSeat('A2', 2, 20, 10)],
+      expected: [],
+    },
+    {
+      name: 'mixed: a seat missing col',
+      layout: 'mixed',
+      seats: [freeSeat('A1', 10, 10)],
+      expected: ['section-layout-mixed'],
+    },
+    {
+      name: 'mixed: a seat missing x/y',
+      layout: 'mixed',
+      seats: [gridSeat('A1', 1)],
+      expected: ['section-layout-mixed'],
+    },
   ];
 
   for (const { name, layout, seats, expected } of cases) {

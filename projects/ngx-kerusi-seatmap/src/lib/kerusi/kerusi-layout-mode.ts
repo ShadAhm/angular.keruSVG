@@ -37,16 +37,12 @@ export function hasCol(item: Positioned): boolean {
 
 /** True when the item carries both freeform coordinates. Neither alone counts. */
 export function hasXY(item: Positioned): boolean {
-  return (
-    item.x !== undefined && item.x !== null && item.y !== undefined && item.y !== null
-  );
+  return item.x !== undefined && item.x !== null && item.y !== undefined && item.y !== null;
 }
 
 /** True when the item carries either coordinate — the `grid` prohibition. */
 export function hasAnyCoordinate(item: Positioned): boolean {
-  return (
-    (item.x !== undefined && item.x !== null) || (item.y !== undefined && item.y !== null)
-  );
+  return (item.x !== undefined && item.x !== null) || (item.y !== undefined && item.y !== null);
 }
 
 /**

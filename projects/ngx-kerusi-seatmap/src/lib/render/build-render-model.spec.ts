@@ -160,9 +160,9 @@ describe('buildRenderModel — state merge (§5.1)', () => {
       seats: { A1: { status: 'held' } },
     };
     expect(
-      buildRenderModel(MIXED_VENUE, state, { selectableStatuses: ['available', 'held'] }).seatsById.get(
-        'A1',
-      )!.selectable,
+      buildRenderModel(MIXED_VENUE, state, {
+        selectableStatuses: ['available', 'held'],
+      }).seatsById.get('A1')!.selectable,
     ).toBe(true);
 
     expect(

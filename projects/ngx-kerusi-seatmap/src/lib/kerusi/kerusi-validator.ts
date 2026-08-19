@@ -301,7 +301,9 @@ function collectMapViolations(map: KerusiMap): KerusiViolation[] {
 
   for (const id of duplicateSections) {
     violations.push(
-      error('section-id-duplicate', `Section id "${id}" is declared more than once (§4.1).`, { id }),
+      error('section-id-duplicate', `Section id "${id}" is declared more than once (§4.1).`, {
+        id,
+      }),
     );
   }
   for (const id of duplicateSeats) {

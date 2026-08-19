@@ -3,169 +3,192 @@
 Which parts of the **Kerusi Seat Map and Availability Format** this library
 implements, and which it does not.
 
-|               |                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Library       | `ngx-kerusi-seatmap` (this repository)                                                                                 |
-| Spec assessed | [Kerusi standard v1.0.0-draft, rev 8](https://github.com/ShadAhm/kerusi/blob/master/RFC/kerusi-standard_v1.0.0-draft.md) |
-| Date          | 2026-08-18                                                                                                               |
+|               |                                                                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Library       | `ngx-kerusi-seatmap` 1.0.0 (this repository)                                                                                              |
+| Spec assessed | [Kerusi standard v1.0.0-draft](https://github.com/ShadAhm/kerusi/blob/master/RFC/kerusi-standard_v1.0.0-draft.md), strict-layout revision |
+| Date          | 2026-08-19                                                                                                                                |
 
-**Headline:** the library is a **conformant consumer** by the spec's own §8
-definition — it merges state by `Seat.id`, enforces §4.6 referential integrity
-including companion symmetry, applies the §4.9 price-resolution order, and
-ignores unrecognized members. The gaps are almost entirely in the **rendering
-and application layer**: data the adapter faithfully parses but the component
-never draws or acts on (pricing, seat types, attributes, localized labels), and
-lifecycle concerns with no home in a pure renderer (hold expiry, delta
-transport, sessions).
+**Headline:** the library is a conformant **consumer** and **validator** by the
+spec's own §7 definition. It merges state by `Seat.id`, enforces §4.6
+referential integrity including companion symmetry, enforces §4.5 layout
+consistency (which §7 requires of validators at v1.0), applies the §4.9
+price-resolution order, and ignores unrecognized members.
+
+The remaining gaps are scope decisions rather than modelling limits: this is a
+renderer, so it defines no transport, and it ships no JSON Schema.
 
 Status key: ✅ supported · ⚠️ partial · ❌ not supported
+
+> The pre-1.0 `SeatRow[]` renderer (`<kerusi-seatpicker>`, `adaptKerusiMap`) is
+> still shipped and still has the limits the previous edition of this report
+> described. Everything below assesses `<kerusi-seatmap>`, the current renderer.
 
 ---
 
 ## §3 Document types
 
-| Type               | Status | Notes                                                                                                                    |
-| ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `KerusiMap`        | ✅     | Typed, validated, adapted, rendered.                                                                                     |
-| `KerusiState`      | ✅     | Typed, validated, merged by `Seat.id`; sparse rule honored.                                                              |
-| `KerusiStateDelta` | ⚠️     | Typed and merged by `applyStateDelta`, but see §5.2 below.                                                               |
-| `KerusiSession`    | ⚠️     | Type only. Nothing consumes it — no validator, and no check that a state's `sessionId` resolves to a session or its map. |
+| Type               | Status | Notes                                                                                                              |
+| ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| `KerusiMap`        | ✅     | Typed, validated, resolved, rendered.                                                                              |
+| `KerusiState`      | ✅     | Typed, validated, merged by `Seat.id`; sparse rule honored.                                                        |
+| `KerusiStateDelta` | ✅     | `KerusiStateStore` applies deltas with ordering and scope enforced. See §5.2 on gap detection.                     |
+| `KerusiSession`    | ✅     | Typed, validated, and joined — `validateDocumentSet` checks a state's `sessionId` and a session's `mapId` resolve. |
 
 ## §4 KerusiMap
 
-| Field                      | Status | Notes                                                                                            |
-| -------------------------- | ------ | ------------------------------------------------------------------------------------------------ |
-| `kerusi`                   | ⚠️     | Presence is required, but the **value is never checked** — a `"2.0"` document would be accepted. |
-| `id`, `sections`, `legend` | ✅     | Required-presence validated.                                                                     |
-| `name`                     | ❌     | Never displayed.                                                                                 |
-| `domain`                   | ✅     | Correctly ignored — the spec marks it non-normative and forbids validating on it.                |
-| `locale`                   | ❌     | Ignored entirely.                                                                                |
-| `priceTiers`               | ⚠️     | Resolved and validated; never rendered (see §4.8/§4.9).                                          |
-| `metadata`                 | ⚠️     | Accepted and preserved on input types, but never surfaced on adapted output.                     |
+| Field                      | Status | Notes                                                                                                           |
+| -------------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| `kerusi`                   | ✅     | Presence **and value** checked. `1.x` accepted (a future minor must not break a parser); other majors rejected. |
+| `id`, `sections`, `legend` | ✅     | Required-presence validated.                                                                                    |
+| `name`                     | ✅     | The map's accessible name.                                                                                      |
+| `domain`                   | ✅     | Correctly ignored for rendering and never used to reject; surfaced on `RenderMap.domain` as a hint only.        |
+| `locale`                   | ✅     | Resolves localized labels; overridable via `[locale]`. Drives RTL when `[rtl]="'auto'"`.                        |
+| `priceTiers`               | ✅     | Resolved, validated, rendered in the legend and the selection total.                                            |
+| `metadata`                 | ⚠️     | Preserved on the input types and reachable via `RenderSeat.source`, but not surfaced as its own field.          |
 
 ## §4.1 Section / §4.2 RowMeta
 
-| Feature                                | Status | Notes                                                                                                                                                                                                                                     |
-| -------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `seats` as a flat list                 | ✅     | Grouped into render rows by `Seat.row`.                                                                                                                                                                                                   |
-| `rows` (RowMeta) labels, `index`       | ✅     | Used for row naming and ordering.                                                                                                                                                                                                         |
-| `Section.index` ordering               | ✅     | Sections are emitted in `index` order.                                                                                                                                                                                                    |
-| **Sections as render units**           | ❌     | All sections **flatten into one continuous row list**. There is no per-section heading, canvas, or grouping, and `Section.label` (with its locale map) is never rendered. The adapter's `sectionId` option renders one section at a time. |
-| Per-section `layout`/`aspectRatio`     | ⚠️     | An adapt result carries **one** `layout` and **one** `aspectRatio`. A map mixing grid and freeform sections resolves to `freeform` for all of them, and only the last freeform section's `aspectRatio` survives.                          |
-| `"mixed"` layout                       | ⚠️     | Treated as freeform wholesale; per-seat mode switching within a section is not done.                                                                                                                                                      |
-| `Section.metadata`, `RowMeta.metadata` | ❌     | Never surfaced.                                                                                                                                                                                                                           |
+| Feature                                | Status | Notes                                                                                                                      |
+| -------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `seats` as a flat list                 | ✅     | Grouped into render rows by `Seat.row`; seats never live inside rows.                                                      |
+| `rows` (RowMeta) labels, `index`       | ✅     | Row naming and ordering. A free-text `row` with no `RowMeta` also works.                                                   |
+| `Section.index` ordering               | ✅     |                                                                                                                            |
+| **Sections as render units**           | ✅     | Each section is its own `<svg>` with its own `viewBox` and layout mode, and a real `<h3>` heading it is `aria-labelledby`. |
+| Per-section `layout` / `aspectRatio`   | ✅     | Resolved per section. A freeform orchestra and a grid balcony coexist in one map.                                          |
+| Localized `Section.label`              | ✅     | BCP-47 chain resolution.                                                                                                   |
+| Section subsetting / overrides         | ✅     | `[sectionIds]` and `[sectionOverrides]`.                                                                                   |
+| `Section.metadata`, `RowMeta.metadata` | ⚠️     | Reachable through `RenderSection.source`, not surfaced separately.                                                         |
 
 ## §4.3 Seat
 
-| Field                             | Status | Notes                                                                                                                                                             |
-| --------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`, `label`, `row`              | ✅     | `id` → `uniqueName`, `label` (defaulting to `id`) → `displayName`.                                                                                                |
-| `col` (grid)                      | ✅     | Sorted by column; skipped columns become aisle spacers (§4.3.2).                                                                                                  |
-| `x` / `y` (freeform)              | ✅     | Rendered natively as percentage coordinates.                                                                                                                      |
-| `rotation`                        | ✅     | Applied as an SVG rotation about the seat center.                                                                                                                 |
-| `type`                            | ⚠️     | Validated against `legend` and exposed on `AdaptedSeat.type` — but does **not** affect rendering. Every seat type draws identically.                              |
-| `priceTier` / `price`             | ⚠️     | Resolved correctly; never displayed.                                                                                                                              |
-| `companions`                      | ⚠️     | Validated for symmetry and exposed, but there is **no booking behavior** — selecting one seat of a couple does not select its partner.                            |
-| `attributes`                      | ⚠️     | Passed through on `AdaptedSeat.attributes`; not rendered, not filterable.                                                                                         |
-| `metadata`                        | ❌     | Not surfaced on adapted output.                                                                                                                                   |
-| **§4.3.1** `col` + `x`/`y`        | ⚠️     | `x`/`y` correctly wins for visual placement. The spec's second purpose for `col` — **logical adjacency for keyboard and screen-reader order** — is unimplemented. |
-| **§4.3.2** no filler objects      | ✅     | Gaps are skipped columns or absent seats; no placeholder seats are emitted.                                                                                       |
-| **§4.3.3** `type` vs `attributes` | ✅     | Attributes never influence price.                                                                                                                                 |
+| Field                             | Status | Notes                                                                                                                          |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `id`, `label`, `row`              | ✅     | `label` defaults to `id`. Seat ids are checked for global uniqueness.                                                          |
+| `col` (grid)                      | ✅     | Places the seat, and orders it for keyboard navigation.                                                                        |
+| `x` / `y` (freeform)              | ✅     | Percentage coordinates mapped onto the section viewBox.                                                                        |
+| `rotation`                        | ✅     | SVG rotation about the seat center.                                                                                            |
+| `type`                            | ✅     | Validated, resolved to the full `SeatType`, and **drives the seat's colour** via `SeatType.color`.                             |
+| `priceTier` / `price`             | ✅     | Resolved per §4.9 and displayed — in the legend, the announcement and the selection total.                                     |
+| `companions`                      | ✅     | Validated for symmetry **and enforced in booking**: the transitive closure selects and deselects as one unit.                  |
+| `attributes`                      | ✅     | Carried on `RenderSeat` and announced. Never affects price or fill (§4.3.3).                                                   |
+| **`accessibility`** (§4.3.4)      | ✅     | Typed, validated, announced in full, and `wheelchairAccessible` marks the seat visually.                                       |
+| `metadata`                        | ⚠️     | Reachable via `RenderSeat.source`.                                                                                             |
+| **§4.3.1** positioning            | ✅     | A seat with neither `col` nor `x`+`y` is rejected. Where both are present, `x`/`y` wins for placement and `col` for adjacency. |
+| **§4.3.1** logical adjacency      | ✅     | `col` orders arrow-key and screen-reader traversal, including in `mixed` sections.                                             |
+| **§4.3.2** no filler objects      | ✅     | A skipped column is empty space. No spacer nodes are synthesized.                                                              |
+| **§4.3.3** `type` vs `attributes` | ✅     | Attributes influence neither price nor colour.                                                                                 |
 
 ## §4.4 Element
 
-| Feature                             | Status | Notes                                                                                                                       |
-| ----------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Rendering elements                  | ⚠️     | Drawn in **freeform layout only**. In grid layout the `elements` input is ignored entirely.                                 |
-| `x`/`y`/`width`/`height`/`rotation` | ✅     | Percentage geometry, rendered and rotatable.                                                                                |
-| `label`                             | ✅     | Drawn centered on the element.                                                                                              |
-| `row` / `col` positioning           | ❌     | Grid-addressed elements (an element sitting in a row's flow) are not supported.                                             |
-| `kind`                              | ⚠️     | Carried but purely informational — every kind renders as the same labelled rectangle. No screen/stage/exit-specific shapes. |
-| `id`                                | ❌     | Dropped during adaptation; the render model has no element identity.                                                        |
-| Validation                          | ❌     | Elements are not validated at all (`id` and `kind` are REQUIRED by the spec but unchecked).                                 |
+| Feature                             | Status | Notes                                                                                                                                    |
+| ----------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Rendering elements                  | ✅     | In **every** layout mode. Grid-addressed elements place in the cell grid.                                                                |
+| `x`/`y`/`width`/`height`/`rotation` | ✅     | Percentages in freeform; `width`/`height` are cell spans in grid mode.                                                                   |
+| `row` / `col` positioning           | ✅     |                                                                                                                                          |
+| `label`                             | ✅     | Drawn centered, except on kinds that read better unlabelled.                                                                             |
+| `kind`                              | ✅     | Drives the shape: screen (arc), stage, exit (accent), lavatory/galley/table, aisle/gap (dashed). Unknown kinds get a labelled rectangle. |
+| `id`                                | ✅     | Preserved on `RenderElement`.                                                                                                            |
+| Validation                          | ✅     | `id` and `kind` required; duplicate ids rejected; unpositioned or cross-mode elements warned.                                            |
 
 ## §4.5 Positioning modes
 
-| Feature                          | Status | Notes                                                                          |
-| -------------------------------- | ------ | ------------------------------------------------------------------------------ |
-| Grid geometry                    | ✅     | Original ported layout.                                                        |
-| Freeform x/y                     | ✅     | Native.                                                                        |
-| `aspectRatio` undistorted canvas | ✅     | A letterboxed content box preserves proportions, rotation, and element sizing. |
-| Inferring layout when omitted    | ✅     | Any seat with `x`/`y` ⇒ freeform, otherwise grid.                              |
+| Feature                                         | Status | Notes                                                                                      |
+| ----------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| `grid` — every seat has `col`, none has `x`/`y` | ✅     | Both halves enforced, including "`col` must be explicit, never inferred from array order". |
+| `freeform` — every seat has `x`+`y`, none `col` | ✅     | Enforced. A free-text `row` is permitted as a label.                                       |
+| `mixed` — every seat has `col` **and** `x`+`y`  | ✅     | Enforced. Laid out from `x`/`y`, navigated by `col`.                                       |
+| Inference when `layout` is omitted              | ✅     | All-`col` ⇒ grid; all-`x`+`y` ⇒ freeform.                                                  |
+| **Rejecting an inconsistent section**           | ✅     | `section-layout-inconsistent`, naming the offending seat. §7 requires this at v1.0.        |
+| `aspectRatio` undistorted canvas                | ✅     | The section's viewBox _is_ its content box, so percentages map linearly.                   |
+| Intrinsic sizing                                | ✅     | A section is sized from its own extents, not stretched into a fixed canvas.                |
 
 ## §4.6 Referential integrity
 
-| Rule                                                | Status                                            |
-| --------------------------------------------------- | ------------------------------------------------- |
-| `Seat.type` resolves in `legend`                    | ✅                                                |
-| `Seat.priceTier` resolves in `priceTiers`           | ✅                                                |
-| `Seat.row` resolves in `Section.rows` when declared | ✅                                                |
-| `Seat.companions[]` resolve within the same section | ✅                                                |
-| `companions` fully symmetric                        | ✅                                                |
-| Errors identify the failing rule and id             | ✅ `KerusiValidationError` carries `rule` + `id`. |
+| Rule                                                | Status                                      |
+| --------------------------------------------------- | ------------------------------------------- |
+| `Seat.type` resolves in `legend`                    | ✅                                          |
+| `Seat.priceTier` resolves in `priceTiers`           | ✅                                          |
+| `Seat.row` resolves in `Section.rows` when declared | ✅                                          |
+| `Seat.companions[]` resolve within the same section | ✅                                          |
+| `companions` fully symmetric                        | ✅                                          |
+| Errors identify the failing rule and id             | ✅ plus a `severity` and a document `path`. |
+| Seat / section / element id uniqueness              | ✅                                          |
 
 ## §4.7–§4.9 Seat types and pricing
 
-| Feature                   | Status | Notes                                                                                                                           |
-| ------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Price-resolution order    | ✅     | `price` → `priceTier` → `type.defaultPriceTier` → unpriced, via `resolveSeatPrice`.                                             |
-| One-currency-per-map rule | ✅     | Validated across seats and tiers.                                                                                               |
-| Money in minor units      | ✅     | Passed through untouched.                                                                                                       |
-| **Displaying price**      | ❌     | The component never renders a price, tier, or total. (The demo computes its own total from `AdaptedSeat.price`.)                |
-| `SeatType.label`          | ❌     | Not rendered; no legend UI is generated from the map.                                                                           |
-| `SeatType.color`          | ❌     | The spec's suggested render color is **ignored** — seat fills come from availability only, so a map cannot color its own types. |
+| Feature                   | Status | Notes                                                                                             |
+| ------------------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| Price-resolution order    | ✅     | `price` → `priceTier` → `type.defaultPriceTier` → unpriced.                                       |
+| One-currency-per-map rule | ✅     | Validated across seats and tiers.                                                                 |
+| Money in minor units      | ✅     | `formatMoney` reads the currency's exponent from `Intl`, so JPY (0) and KWD (3) render correctly. |
+| **Displaying price**      | ✅     | In the legend, the accessible name, and `summarizeSelection`.                                     |
+| `SeatType.label`          | ✅     | Localized, rendered in the legend, announced per seat.                                            |
+| `SeatType.color`          | ✅     | Applied to available seats, with a contrast-correct label colour. Availability outranks it.       |
 
 ## §5 State, deltas, sessions
 
-| Feature                                       | Status | Notes                                                                                                                                                                                                                                                                       |
-| --------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Merge by `Seat.id`                            | ✅     |                                                                                                                                                                                                                                                                             |
-| Sparse rule (absent ⇒ available)              | ✅     |                                                                                                                                                                                                                                                                             |
-| `available`/`booked`/`held`/`blocked`         | ✅     | Four distinct render states; held and blocked are non-selectable.                                                                                                                                                                                                           |
-| Exactly one of `sessionId`/`mapId`            | ✅     | Validated.                                                                                                                                                                                                                                                                  |
-| `holdExpires`                                 | ❌     | Typed and carried, never acted on — no countdown, and no automatic revert when a hold lapses.                                                                                                                                                                               |
-| **§5.2** delta application                    | ⚠️     | `applyStateDelta` merges correctly (explicit `"available"` reverts, omission means unchanged), but **`updatedAt` ordering is not enforced**: out-of-order deltas are not detected or discarded, and the spec's "re-fetch on a sequence gap" guidance is left to the caller. |
-| Delta transport                               | ❌     | No WebSocket/SSE layer — this is a renderer, not a client.                                                                                                                                                                                                                  |
-| **§5.3** sessions                             | ❌     | No session-aware API; nothing verifies a state's `sessionId` against a `KerusiSession` or its `mapId`.                                                                                                                                                                      |
-| `KerusiState.metadata`, `SeatStatus.metadata` | ❌     | Not surfaced.                                                                                                                                                                                                                                                               |
+| Feature                                       | Status | Notes                                                                                                                                           |
+| --------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Merge by `Seat.id`                            | ✅     |                                                                                                                                                 |
+| Sparse rule (absent ⇒ available)              | ✅     |                                                                                                                                                 |
+| `available`/`booked`/`held`/`blocked`         | ✅     | Four distinct render states; only `available` is selectable by default, and the set is configurable.                                            |
+| Exactly one of `sessionId`/`mapId`            | ✅     | Validated.                                                                                                                                      |
+| `holdExpires`                                 | ✅     | Announced as a clock time, and `[expireHolds]` reverts a lapsed hold on a ticker.                                                               |
+| **§5.2** delta application                    | ✅     | Ordered by `updatedAt`; stale, duplicate and out-of-scope deltas discarded.                                                                     |
+| **§5.2** gap detection                        | ⚠️     | Detected when the transport supplies a monotonic sequence. `updatedAt` alone cannot distinguish a lost message from a quiet period — see below. |
+| Delta transport                               | ❌     | No WebSocket/SSE layer, by design. The spec defines a format, not a transport (§9).                                                             |
+| **§5.3** sessions                             | ✅     | `validateDocumentSet` checks the map/session/state joins.                                                                                       |
+| `KerusiState.metadata`, `SeatStatus.metadata` | ⚠️     | Carried on the input types; not surfaced on the render model.                                                                                   |
 
-## §8 Conformance / §9 Interchange
+**On gap detection.** §5.2 requires `updatedAt` to be strictly increasing, not
+contiguous. Two deltas an hour apart are indistinguishable from two deltas with
+a lost message between them, so no consumer can detect a gap from `updatedAt`
+alone. `KerusiStateStore` therefore detects gaps only when the transport
+supplies a sequence — `metadata.seq` by default, or an injected `sequenceOf`
+reader — and applies a gapped delta anyway, so the map degrades rather than
+freezes while the consumer re-fetches, per the spec's "SHOULD discard and
+re-fetch".
 
-| Requirement                                    | Status | Notes                                                                                    |
-| ---------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
-| Merge state by `Seat.id`                       | ✅     |                                                                                          |
-| Enforce §4.6 incl. companion symmetry          | ✅     |                                                                                          |
-| Apply §4.9 price order                         | ✅     |                                                                                          |
-| Ignore unrecognized members                    | ✅     | Unknown fields pass through untouched; nothing is rejected for them.                     |
-| Published JSON Schema (§9)                     | ❌     | None shipped; validation is the hand-written TypeScript validator only.                  |
-| `.kerusi.json` / `application/vnd.kerusi+json` | ❌     | No loader, fetch helper, or media-type handling — callers supply already-parsed objects. |
-| Version negotiation                            | ❌     | The `kerusi` member's value is not checked.                                              |
+## §7 Conformance / §8 Interchange
 
-## §11 Open issues (unsupported by extension)
+| Requirement                                         | Status | Notes                                                                                                        |
+| --------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| Merge state by `Seat.id`                            | ✅     |                                                                                                              |
+| Enforce §4.6 incl. companion symmetry               | ✅     |                                                                                                              |
+| **Enforce `Section.layout` consistency**            | ✅     | Required of validators at v1.0, and enforced.                                                                |
+| Apply §4.9 price order                              | ✅     |                                                                                                              |
+| Ignore unrecognized members                         | ✅     | Nothing is rejected for an unknown member, and a future `1.x` minor is accepted.                             |
+| Producer conformance                                | n/a    | This library consumes documents; it does not emit them.                                                      |
+| Published JSON Schema (§8)                          | ❌     | None shipped. Validation is the hand-written TypeScript validator, which does enforce every MUST-level rule. |
+| `.kerusi.json` / `application/vnd.kerusi+json` (§8) | ❌     | No loader or media-type handling — callers supply already-parsed objects.                                    |
+| Version negotiation                                 | ✅     | The `kerusi` member's value is checked, accepting `1.x` and rejecting other majors.                          |
 
-| Issue                       | Status | Notes                                                                                                                                                                                     |
-| --------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Accessibility               | ❌     | No keyboard navigation, focus management, ARIA roles, or screen-reader ordering. Seats are clickable `<g>` elements. `wheelchair` is carried as a free-text attribute but drives nothing. |
-| Right-to-left row direction | ❌     | Rendering is always left-to-right; `locale` is ignored.                                                                                                                                   |
-| Multi-leg / multi-day       | ❌     | Out of scope for a renderer.                                                                                                                                                              |
-| Labelled gaps               | ⚠️     | Works as a freeform `Element`; there is no grid-addressed equivalent.                                                                                                                     |
+## Accessibility and rendering concerns
+
+These are not spec requirements — the standard is renderer-agnostic — but §4.3.1
+names screen-reader ordering as a purpose of `col`, and §4.3.4 exists to be
+surfaced.
+
+| Feature                      | Status | Notes                                                                                                          |
+| ---------------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| Keyboard navigation          | ✅     | Per-section roving tabindex; arrows follow `col`; Home/End/PageUp/PageDown/Enter/Space/Escape.                 |
+| Screen-reader announcement   | ✅     | Position, type, price, status, hold expiry, every accessibility property, attributes.                          |
+| Live region                  | ✅     | Announces the running selection and the reason a seat could not be taken.                                      |
+| Right-to-left                | ✅     | Derived from the locale; mirrors layout and arrow direction, leaving `col` order intact.                       |
+| Focus visibility             | ✅     | A themed `:focus-visible` ring that follows a rotated seat.                                                    |
+| Reduced motion               | ✅     | Transitions disabled under `prefers-reduced-motion`.                                                           |
+| Multi-leg / multi-day (§5.4) | ❌     | Out of scope. The spec scopes itself to one configuration at a time and takes no position on correlating them. |
 
 ---
 
-## The gaps that matter most
+## What is left
 
-1. **Nothing in the map can influence how a seat looks.** `SeatType.color`,
-   `type`, `attributes`, and price are all parsed, validated, and exposed — then
-   ignored by the renderer, which colors purely by availability. This is the
-   biggest divergence between "we understand the document" and "we draw the
-   document."
-2. **Sections don't survive as structure.** A multi-section venue renders as one
-   undifferentiated run of rows, with no section labels and a single layout mode
-   for the whole map.
-3. **Accessibility is absent**, including the navigation-order use of `col` that
-   §4.3.1 explicitly calls out.
-4. **State lifecycle is caller-owned**: hold expiry and delta ordering/gap
-   recovery are both defined by the spec but delegated entirely to the consumer.
-
-None of these are blocked by the format — they are unbuilt UI and application
-behavior, not modelling limitations.
+1. **A published JSON Schema (§8).** The TypeScript validator enforces every
+   MUST-level rule, but a schema would let non-TypeScript producers validate.
+2. **Loader and media-type conventions (§8).** `.kerusi.json` and
+   `application/vnd.kerusi+json` have no handling; callers parse their own JSON.
+3. **`metadata` on the render model.** It survives on `*.source`, but a
+   first-class field would save consumers a hop.
+4. **Transport.** Deliberately absent — the spec defines a data format, and a
+   renderer should not own the socket.

@@ -93,10 +93,7 @@ export function computeSectionLayout(
  * empty space — §4.3.2's "no filler objects": the gap that is an aisle needs no
  * placeholder seat, and none is synthesized.
  */
-function computeGridLayout(
-  section: RenderSection,
-  options: SectionLayoutOptions,
-): SectionLayout {
+function computeGridLayout(section: RenderSection, options: SectionLayoutOptions): SectionLayout {
   const size = options.seatSize ?? DEFAULTS.seatSize;
   const gap = options.seatGap ?? DEFAULTS.seatGap;
   const pitch = size + gap;
@@ -204,13 +201,7 @@ function computeFreeformLayout(
     const elHeight = ((element.height ?? 6) / 100) * height;
     const centerX = ((element.x ?? 50) / 100) * width;
     const centerY = ((element.y ?? 50) / 100) * height;
-    return elementBox(
-      element,
-      centerX - elWidth / 2,
-      centerY - elHeight / 2,
-      elWidth,
-      elHeight,
-    );
+    return elementBox(element, centerX - elWidth / 2, centerY - elHeight / 2, elWidth, elHeight);
   });
 
   return { width, height, seats, elements };

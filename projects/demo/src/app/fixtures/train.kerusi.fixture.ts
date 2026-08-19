@@ -51,9 +51,24 @@ export const TRAIN_MAP: KerusiMap = {
   domain: 'train',
   locale: 'en',
   legend: [
-    { id: 'standard', label: { en: 'Standard', ms: 'Biasa' }, color: '#4f7f8f', defaultPriceTier: 'std' },
-    { id: 'table', label: { en: 'Table bay', ms: 'Meja' }, color: '#7f5f8f', defaultPriceTier: 'table' },
-    { id: 'accessible', label: { en: 'Accessible', ms: 'Boleh Diakses' }, color: '#c78a2e', defaultPriceTier: 'std' },
+    {
+      id: 'standard',
+      label: { en: 'Standard', ms: 'Biasa' },
+      color: '#4f7f8f',
+      defaultPriceTier: 'std',
+    },
+    {
+      id: 'table',
+      label: { en: 'Table bay', ms: 'Meja' },
+      color: '#7f5f8f',
+      defaultPriceTier: 'table',
+    },
+    {
+      id: 'accessible',
+      label: { en: 'Accessible', ms: 'Boleh Diakses' },
+      color: '#c78a2e',
+      defaultPriceTier: 'std',
+    },
   ],
   priceTiers: [
     { id: 'std', label: 'Standard', price: { amount: 7900, currency: 'MYR' } },
