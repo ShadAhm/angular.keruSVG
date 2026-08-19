@@ -1,29 +1,19 @@
-# Kerusi format support
+# Rendering Kerusi documents
 
-`ngx-keruc-seatpicker` can consume a [**Kerusi Seat Map & Availability
-Format**](https://github.com/ShadAhm/angular.keruSVG) document pair — a static
-`KerusiMap` (layout, seat types, pricing) plus a live `KerusiState`
-(availability) — and render it through the existing `<keruc-seatpicker>`
-component with no renderer changes. This is an **additive** entry point; the
-native `rows`/`SeatRow[]` API is unchanged.
+`ngx-kerusi-seatmap` consumes the [**Kerusi Seat Map & Availability
+Format**](https://github.com/ShadAhm/kerusi) natively: a static `KerusiMap`
+(layout, seat types, pricing) plus a live `KerusiState` (availability) go
+straight into `<kerusi-seatmap>`.
 
-Kerusi is a vendor-neutral, domain-agnostic JSON format (cinema, flight, bus,
-theatre, stadium…). This page shows the minimal wiring; see the full standard
-for the normative rules.
+Kerusi is a vendor-neutral, domain-agnostic JSON format — cinema, flight, bus,
+theatre, stadium, train — and this page shows how each part of it turns into
+something on screen. See the standard for the normative rules.
 
-## Feed a map + state into the component
-
-The adapter turns a `KerusiMap` (+ optional `KerusiState`) into the `SeatRow[]`
-the component already accepts:
+## The minimum
 
 ```ts
-import { Component, signal } from '@angular/core';
-import {
-  SeatPickerComponent,
-  kerusiToRows,
-  type KerusiMap,
-  type KerusiState,
-} from 'ngx-keruc-seatpicker';
+import { Component } from '@angular/core';
+import { KerusiSeatmapComponent, type KerusiMap, type KerusiState } from 'ngx-kerusi-seatmap';
 
 const map: KerusiMap = {
   kerusi: '1.0',
@@ -36,7 +26,7 @@ const map: KerusiMap = {
       seats: [
         { id: '1A', row: '1', col: 1, type: 'standard' },
         { id: '1B', row: '1', col: 2, type: 'standard' },
-        // col 3 is omitted — that gap is the aisle (no filler node needed)
+        // col 3 is omitted — that gap is the aisle (no filler seat, §4.3.2)
         { id: '1C', row: '1', col: 4, type: 'standard' },
         { id: '1D', row: '1', col: 5, type: 'standard' },
       ],
@@ -47,99 +37,245 @@ const map: KerusiMap = {
 const state: KerusiState = {
   kerusi: '1.0',
   mapId: 'bus-42',
-  updatedAt: '2026-08-17T09:14:00Z',
+  updatedAt: '2026-08-19T09:14:00Z',
   seats: { '1A': { status: 'booked' } }, // everything else defaults to available
 };
 
 @Component({
   selector: 'app-bus',
-  imports: [SeatPickerComponent],
-  template: `<keruc-seatpicker [rows]="rows()" />`,
+  imports: [KerusiSeatmapComponent],
+  template: `<kerusi-seatmap [map]="map" [state]="state" />`,
 })
 export class BusComponent {
-  // one line: adapt the Kerusi pair to the component's rows
-  readonly rows = signal(kerusiToRows(map, state));
+  protected readonly map = map;
+  protected readonly state = state;
 }
 ```
 
-`kerusiToRows` **validates** the map first (referential integrity, companion
-symmetry, single currency, seat positioning — spec §4.6/§4.9/§4.3.1) and throws
-a `KerusiValidationError` naming the failing rule and seat id if the document is
-malformed.
+That section declares no `layout`. Every seat has `col` and none has `x`/`y`, so
+§4.5 infers `grid`.
 
-## Getting the richer per-seat data
+## Positioning modes (§4.5)
 
-The flat `SeatNode` the grid renders can only carry `uniqueName`,
-`displayName`, and selection state. When you also need companions, resolved
-price, attributes, or the originating section, use `adaptKerusiMap`, which
-returns both the rows and a parallel `AdaptedSeat[]`:
+`Section.layout` is a **strict, validated constraint**, not a hint. A section
+that breaks it is invalid, and the library rejects it.
 
-```ts
-import { adaptKerusiMap } from 'ngx-keruc-seatpicker';
+### `grid`
 
-const { rows, seats } = adaptKerusiMap(map, state);
-const seat = seats.find((s) => s.id === 'L1');
-seat?.companions; // ['L2']  — couple/sofa links survive the adapter
-seat?.price; // { amount: 4500, currency: 'MYR' } — resolved per §4.9
-```
-
-Other exports: `resolveSeatPrice(seat, map)` (price resolution on its own),
-`validateKerusiMap` / `validateKerusiState` / `validateKerusiStateDelta`, and
-`applyStateDelta(base, delta)` for merging incremental `KerusiStateDelta`
-updates onto a held `KerusiState`.
-
-## Freeform layouts, screen elements, and availability states
-
-Freeform (`x`/`y`) sections are rendered natively — curved rows, per-seat
-`rotation`, and non-bookable `Element`s (screens, stages) are all drawn. The
-adapter surfaces everything the component needs, so binding it is mechanical:
+Every seat has `col`; no seat has `x` or `y`. `col` is required explicitly on
+every seat — it is never inferred from array order, because `Section.seats` is
+an unordered list.
 
 ```ts
-const { rows, elements, layout, aspectRatio } = adaptKerusiMap(map, state);
+{ id: 'cabin', layout: 'grid', seats: [
+  { id: '12A', row: '12', col: 1, type: 'economy', attributes: ['window'] },
+  { id: '12B', row: '12', col: 2, type: 'economy' },
+  { id: '12C', row: '12', col: 3, type: 'economy', attributes: ['aisle'] },
+  // col 4 is the aisle
+  { id: '12D', row: '12', col: 5, type: 'economy', attributes: ['aisle'] },
+]}
 ```
 
-```html
-<keruc-seatpicker
-  [rows]="rows"
-  [elements]="elements"
-  [layout]="layout"
-  [aspectRatio]="aspectRatio"
-  [canvasWidth]="640"
-  [canvasHeight]="400"
-/>
-```
+### `freeform`
 
-`layout` is `'freeform'` when the map uses `x`/`y` positioning (§4.5) and
-`'grid'` otherwise. `aspectRatio` keeps freeform percentages and rotation
-undistorted on a non-square canvas.
-
-Availability maps to distinct states by default: `booked → Occupied`,
-`held → Held`, `blocked → Blocked`, and `available`/absent → `Vacant`. Held and
-Blocked render in their own colors and are non-selectable. Override the mapping
-when you want to collapse or remap them:
+Every seat has both `x` and `y`, as percentages of the section canvas; no seat
+has `col`. `rotation` tilts a seat to follow a curve, and `aspectRatio` fixes
+the canvas proportions so those percentages mean the same thing at any size.
 
 ```ts
-import { SeatState } from 'ngx-keruc-seatpicker';
-
-kerusiToRows(map, state, {
-  statusMapping: (s) => (s === 'booked' ? SeatState.Occupied : SeatState.Vacant),
-});
+{ id: 'house', layout: 'freeform', aspectRatio: '16:9', seats: [
+  { id: 'A1', row: 'A', x: 20, y: 30, rotation: -8, type: 'standard' },
+  { id: 'A2', row: 'A', x: 27, y: 28, rotation: -5, type: 'standard' },
+]}
 ```
 
-### Remaining edges
+A `row` is still allowed here, purely as a label — it carries no positional
+information, so it does not break the constraint, and the renderer uses it for
+grouping and keyboard order.
 
-- A single map that mixes grid and freeform sections renders as `freeform`
-  (the result carries one `layout`); render such sections separately with the
-  `sectionId` option if you need each in its own mode.
-- All `Element` kinds share one visual style (a labelled rounded rect); the
-  renderer does not draw kind-specific shapes.
+### `mixed`
 
-## Reference
+Every seat has `col` **and** both `x` and `y`. This is the only mode where a
+seat may combine both. `x`/`y` places the seat; `col` remains its logical
+adjacency ordinal, which is what arrow keys and screen readers follow (§4.3.1).
 
-Full normative specification: the **Kerusi Seat Map & Availability Format**
-(v1.0.0-draft). The five worked examples used as tests here correspond to spec
-§6.1–§6.5.
+```ts
+{ id: 'north-stand', layout: 'mixed', aspectRatio: '3:2', seats: [
+  { id: 'N-1-1', row: 'N-1', col: 1, x: 34, y: 22, rotation: 0, type: 'main' },
+  { id: 'N-1-2', row: 'N-1', col: 2, x: 38, y: 22, rotation: 0, type: 'main' },
+]}
+```
 
-For a feature-by-feature audit of what this library supports, partially
-supports, and does not implement, see
-[the Kerusi conformance report](kerusi-conformance.md).
+### Inference and rejection
+
+Omit `layout` and it is inferred: all-`col`-no-coordinates is `grid`,
+all-`x`-and-`y`-no-`col` is `freeform`. Anything else is rejected — there is no
+inference for `mixed`, so a seat carrying all three must say so.
+
+```ts
+import { checkKerusiMap } from 'ngx-kerusi-seatmap';
+
+checkKerusiMap(map);
+// [{ rule: 'section-layout-grid', severity: 'error',
+//    path: 'sections[0].seats[3]',
+//    message: 'Seat "A4" is in grid section "main" but carries "x"/"y" ...' }]
+```
+
+## Sections are render units
+
+Each `Section` gets its own `<svg>`, its own layout mode, its own aspect ratio
+and its own heading. A venue can mix them freely:
+
+```ts
+sections: [
+  { id: 'orchestra', index: 1, label: { en: 'Orchestra', ms: 'Orkestra' },
+    layout: 'freeform', aspectRatio: '5:2', seats: [...] },
+  { id: 'balcony', index: 2, label: { en: 'Balcony', ms: 'Balkoni' },
+    layout: 'grid', seats: [...] },
+]
+```
+
+Sections render in `Section.index` order. Restrict or reorder them with
+`[sectionIds]`, and tune individual ones with `[sectionOverrides]`.
+
+## Elements (§4.4)
+
+Non-bookable fixtures — screens, stages, exits, lavatories, gaps, tables —
+positioned the same way seats are. `id` and `kind` are required.
+
+```ts
+elements: [
+  // Freeform: x/y/width/height are percentages of the section canvas.
+  { id: 'screen', kind: 'screen', label: 'SCREEN', x: 50, y: 7, width: 66, height: 4 },
+  // Grid: col and row place it in the cell grid; width/height are cell spans.
+  { id: 'lav', kind: 'lavatory', label: 'WC', row: '16', col: 7, width: 2 },
+];
+```
+
+`kind` drives the shape: a `screen` draws as an arc, a `stage` as a raised
+platform, an `exit` in the accent colour, an `aisle` or `gap` as a dashed
+outline. An unrecognized kind draws as a labelled rectangle.
+
+## Seat types, pricing and the legend
+
+`SeatType.color` is the standard's suggested render colour, and an available
+seat takes it. Availability still outranks it — a booked seat renders as booked,
+never in its type's colour.
+
+Price resolves through the §4.9 order: `Seat.price`, then `Seat.priceTier`, then
+`SeatType.defaultPriceTier`, then unpriced (a valid terminal state). Amounts are
+minor units, and `formatMoney` reads the currency's exponent rather than
+assuming two digits — so JPY and KWD come out right.
+
+```ts
+import { summarizeSelection, formatMoney, buildRenderModel } from 'ngx-kerusi-seatmap';
+
+const model = buildRenderModel(map, state);
+const { seats, total, unpriced } = summarizeSelection(model, selection());
+formatMoney(total, 'ms-MY'); // "RM 104.00"
+```
+
+`[showLegend]="true"` renders a key from `KerusiMap.legend` and `priceTiers`.
+
+## Companions (§4.6)
+
+`companions` must be symmetric, and the library treats the transitive closure as
+one unit: selecting a love seat takes its partner, deselecting either releases
+both, `maxSelection` counts the pair, and a pair whose other half is sold is
+refused with `reason: 'companion-unavailable'` rather than half-taken.
+
+```ts
+{ id: 'L1', row: 'L', x: 28, y: 90, type: 'sofa', companions: ['L2'] },
+{ id: 'L2', row: 'L', x: 36, y: 89, type: 'sofa', companions: ['L1'] },
+```
+
+Set `[companionMode]="'independent'"` to handle the pairing yourself.
+
+## Accessibility (§4.3.4)
+
+`Seat.accessibility` is structured, not a free-text tag, and everything in it is
+announced:
+
+```ts
+{
+  id: '15C', row: '15', col: 3, type: 'accessible',
+  attributes: ['aisle'],
+  companions: ['15B'],
+  accessibility: {
+    wheelchairAccessible: true,
+    transferArmrest: 'left',
+    aisleChairCompatible: true,
+    companionRequired: true,
+  },
+}
+```
+
+> "Row 15, seat C, Accessible, MYR 140.00, available, wheelchair accessible,
+> transfer armrest left, aisle chair compatible, companion seat required, aisle."
+
+Pair `companionRequired` with `companions` so the companion seat is actually
+linked, not merely implied.
+
+## Localization
+
+`Section.label` and `SeatType.label` may be locale maps. Resolution walks the
+BCP-47 chain — `ms-MY` → `ms` → the fallback locale → the first key — so a map
+localized into languages you did not ask for still renders something.
+
+```ts
+legend: [{ id: 'standard', label: { en: 'Standard', 'ms-MY': 'Biasa' } }];
+```
+
+`[locale]` overrides `KerusiMap.locale`. `[rtl]` defaults to `auto` and derives
+the direction from the resolved locale, mirroring the layout and the arrow keys
+while leaving `col` order — and so reading order — untouched.
+
+## Live availability (§5.1, §5.2)
+
+A `KerusiState` is sparse: a seat absent from `seats` is available. Statuses are
+`available`, `held` (with an optional `holdExpires`), `booked` and `blocked`;
+all four render distinctly and only `available` is selectable by default.
+
+For a push transport, `KerusiStateStore` applies `KerusiStateDelta` documents:
+
+```ts
+const store = new KerusiStateStore(initialState);
+const result = store.apply(delta);
+// 'applied' | 'stale' | 'duplicate' | 'gap' | 'scope-mismatch'
+```
+
+Set `[expireHolds]="true"` to have a lapsed hold revert to available on screen.
+
+## Sessions (§5.3)
+
+A `KerusiSession` joins a reusable map to a specific showtime, and a
+`KerusiState` may reference it by `sessionId` instead of `mapId`. Pass it as
+`[session]` and the library checks the joins actually resolve.
+
+```ts
+const session: KerusiSession = {
+  kerusi: '1.0',
+  id: 'hall-3-2026-08-19-1930',
+  mapId: 'gsc-hall-3',
+  label: 'Dune: Part Three — 7:30pm',
+  startsAt: '2026-08-19T19:30:00+08:00',
+};
+```
+
+## Migrating from the `SeatRow[]` adapter
+
+Pre-1.0 the only entry point was `adaptKerusiMap`, which flattened a document
+into the legacy grid model:
+
+```ts
+// Before
+<kerusi-seatpicker [rows]="kerusiToRows(map, state)" />
+
+// After
+<kerusi-seatmap [map]="map" [state]="state" />
+```
+
+The adapter still works, but it cannot represent a multi-section venue: one
+layout mode and one aspect ratio apply to the whole map, elements render only in
+freeform sections, and element ids are dropped. It also now validates
+`Section.layout` strictly, so a document that previously adapted may throw.

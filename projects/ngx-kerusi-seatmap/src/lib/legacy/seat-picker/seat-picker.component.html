@@ -1,0 +1,58 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  [attr.width]="computedLayout().width"
+  [attr.height]="computedLayout().height"
+>
+  <rect
+    x="0"
+    y="0"
+    [attr.width]="computedLayout().width"
+    [attr.height]="computedLayout().height"
+    [attr.fill]="resolvedColors().backDropColour"
+  />
+  @for (element of computedLayout().elements; track $index) {
+    <g class="kerusi-element" [attr.transform]="transform(element)">
+      <rect
+        rx="4"
+        [attr.x]="element.x"
+        [attr.y]="element.y"
+        [attr.width]="element.width"
+        [attr.height]="element.height"
+        [attr.fill]="elementFill()"
+      />
+      @if (element.element.label) {
+        <text
+          text-anchor="middle"
+          dominant-baseline="central"
+          [attr.x]="element.centerX"
+          [attr.y]="element.centerY"
+          [attr.font-size]="element.fontSize"
+          [attr.fill]="elementTextFill()"
+        >
+          {{ element.element.label }}
+        </text>
+      }
+    </g>
+  }
+  @for (seat of computedLayout().seats; track seat.node) {
+    <g class="kerusi-seat" [attr.transform]="transform(seat)" (click)="onSeatClick(seat)">
+      <rect
+        [attr.x]="seat.x"
+        [attr.y]="seat.y"
+        [attr.width]="seat.width"
+        [attr.height]="seat.height"
+        [attr.fill]="fill(seat.node)"
+      />
+      <text
+        text-anchor="middle"
+        dominant-baseline="central"
+        [attr.x]="seat.centerX"
+        [attr.y]="seat.centerY"
+        [attr.font-size]="seat.fontSize"
+        [attr.fill]="textFill(seat.node)"
+      >
+        {{ seat.node.displayName }}
+      </text>
+    </g>
+  }
+</svg>

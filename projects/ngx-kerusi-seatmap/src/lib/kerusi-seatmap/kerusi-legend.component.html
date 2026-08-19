@@ -1,0 +1,39 @@
+<div class="kerusi-legend">
+  @if (types().length) {
+    <div class="kerusi-legend__block">
+      <h4 class="kerusi-legend__heading">{{ headingSeatTypes() }}</h4>
+      <ul class="kerusi-legend__list">
+        @for (entry of types(); track entry.id) {
+          <li class="kerusi-legend__item">
+            <span
+              class="kerusi-legend__swatch"
+              aria-hidden="true"
+              [style.background]="swatch(entry)"
+              [style.color]="swatchText(entry)"
+            ></span>
+            <span class="kerusi-legend__label">{{ entry.label }}</span>
+            @if (showPrices() && price(entry)) {
+              <span class="kerusi-legend__price">{{ price(entry) }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="kerusi-legend__block">
+    <h4 class="kerusi-legend__heading">{{ headingAvailability() }}</h4>
+    <ul class="kerusi-legend__list">
+      @for (status of statuses(); track status.key) {
+        <li class="kerusi-legend__item">
+          <span
+            class="kerusi-legend__swatch"
+            aria-hidden="true"
+            [style.background]="status.color"
+          ></span>
+          <span class="kerusi-legend__label">{{ status.label }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

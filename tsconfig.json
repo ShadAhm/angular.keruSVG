@@ -7,7 +7,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "ngx-keruc-seatpicker": ["./projects/kerusvg/src/public-api.ts"]
+      "ngx-kerusi-seatmap": ["./projects/ngx-kerusi-seatmap/src/public-api.ts"]
     },
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
@@ -25,10 +25,10 @@
   "files": [],
   "references": [
     {
-      "path": "./projects/kerusvg/tsconfig.lib.json"
+      "path": "./projects/ngx-kerusi-seatmap/tsconfig.lib.json"
     },
     {
-      "path": "./projects/kerusvg/tsconfig.spec.json"
+      "path": "./projects/ngx-kerusi-seatmap/tsconfig.spec.json"
     },
     {
       "path": "./projects/demo/tsconfig.app.json"

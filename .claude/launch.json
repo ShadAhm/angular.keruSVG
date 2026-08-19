@@ -4,8 +4,8 @@
     {
       "name": "demo",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["ng", "serve", "demo", "--port", "4200"],
-      "port": 4200
+      "runtimeArgs": ["ng", "serve", "demo", "--port", "4310"],
+      "port": 4310
     }
   ]
 }

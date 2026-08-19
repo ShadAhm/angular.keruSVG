@@ -2,24 +2,25 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
-    "kerusvg": {
+    "ngx-kerusi-seatmap": {
       "projectType": "library",
-      "root": "projects/kerusvg",
-      "sourceRoot": "projects/kerusvg/src",
-      "prefix": "keruc",
+      "root": "projects/ngx-kerusi-seatmap",
+      "sourceRoot": "projects/ngx-kerusi-seatmap/src",
+      "prefix": "kerusi",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
-              "tsConfig": "projects/kerusvg/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-kerusi-seatmap/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/kerusvg/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-kerusi-seatmap/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,7 +28,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/kerusvg/tsconfig.spec.json"
+            "tsConfig": "projects/ngx-kerusi-seatmap/tsconfig.spec.json"
           }
         }
       }
@@ -50,7 +51,9 @@
                 "input": "projects/demo/public"
               }
             ],
-            "styles": ["projects/demo/src/styles.css"]
+            "styles": [
+              "projects/demo/src/styles.css"
+            ]
           },
           "configurations": {
             "production": {
@@ -62,8 +65,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"

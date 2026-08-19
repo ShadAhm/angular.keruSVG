@@ -1,0 +1,8 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+}
+
+.kerusi-seat {
+  cursor: pointer;
+}

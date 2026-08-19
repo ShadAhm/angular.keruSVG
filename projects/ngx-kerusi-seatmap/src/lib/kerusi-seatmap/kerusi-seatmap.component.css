@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.kerusi-seatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.kerusi-seatmap__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kerusi-section-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* Visually hidden, still announced. */
+.kerusi-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

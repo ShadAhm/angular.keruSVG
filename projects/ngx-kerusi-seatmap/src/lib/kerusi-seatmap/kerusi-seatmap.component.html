@@ -1,0 +1,47 @@
+<div
+  class="kerusi-seatmap"
+  role="group"
+  [attr.aria-label]="mapLabel()"
+  [attr.dir]="isRtl() ? 'rtl' : null"
+  [attr.lang]="resolvedLocale()"
+>
+  @for (section of renderMap().sections; track section.id) {
+    <section
+      class="kerusi-seatmap__section kerusi-seatmap__section--{{ section.layoutMode }}"
+      role="group"
+      [attr.aria-labelledby]="labelFor(section) ? labelId(section) : null"
+      [attr.aria-label]="labelFor(section) ? null : section.id"
+    >
+      @if (showSectionLabels() && labelFor(section)) {
+        <h3 class="kerusi-section-label" [id]="labelId(section)">{{ labelFor(section) }}</h3>
+      }
+
+      <kerusi-section
+        [section]="section"
+        [layout]="layoutFor(section)"
+        [selection]="selectionSet()"
+        [focusedSeatId]="focusedSeatIn(section)"
+        [ariaLabels]="ariaLabels()"
+        [colors]="resolvedColors()"
+        [typeColors]="typeColors()"
+        [unitScale]="unitScale()"
+        [interactive]="interactive()"
+        (seatActivate)="onSeatActivate($event)"
+        (seatFocused)="onSeatFocused($event)"
+        (seatKeydown)="onKeydown(section, $event)"
+      />
+    </section>
+  }
+
+  @if (showLegend()) {
+    <kerusi-legend
+      [legend]="renderMap().legend"
+      [locale]="resolvedLocale()"
+      [colors]="resolvedColors()"
+      [typeColors]="typeColors()"
+      [showPrices]="showLegendPrices()"
+    />
+  }
+
+  <p class="kerusi-sr-only" aria-live="polite" aria-atomic="true">{{ liveMessage() }}</p>
+</div>
