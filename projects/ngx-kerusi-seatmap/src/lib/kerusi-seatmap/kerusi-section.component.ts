@@ -1,0 +1,141 @@
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { elementStyle, screenPath } from '../render/element-shapes';
+import { PlacedElement, PlacedSeat, SectionLayout } from '../render/section-layout';
+import { RenderSection } from '../render/render-model';
+import {
+  DEFAULT_KERUSI_COLORS,
+  elementFill,
+  elementTextFill,
+  KerusiSeatmapColors,
+  seatFill,
+  seatTextFill,
+} from './kerusi-seatmap-colors';
+
+/**
+ * Draws one Kerusi `Section` as a single `<svg>`.
+ *
+ * One SVG per section — rather than section groups inside a shared canvas — is
+ * what makes per-section `aspectRatio` and mixed grid/freeform modes work: each
+ * gets its own `viewBox` and its own intrinsic proportions, and CSS is free to
+ * stack, wrap or column them. It also puts the section heading in real DOM,
+ * where a screen reader can use it as a landmark.
+ *
+ * This component holds no state. It takes a placed layout and emits intent.
+ */
+@Component({
+  selector: 'kerusi-section',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './kerusi-section.component.html',
+  styleUrl: './kerusi-section.component.css',
+})
+export class KerusiSectionComponent {
+  readonly section = input.required<RenderSection>();
+  readonly layout = input.required<SectionLayout>();
+
+  /** Currently selected seat ids. */
+  readonly selection = input<ReadonlySet<string>>(new Set());
+  /** The seat holding the section's single tab stop, if any. */
+  readonly focusedSeatId = input<string | null>(null);
+  /** Per-seat accessible names, keyed by seat id. */
+  readonly ariaLabels = input<ReadonlyMap<string, string>>(new Map());
+
+  readonly colors = input<Required<KerusiSeatmapColors>>(DEFAULT_KERUSI_COLORS);
+  /** Whether an available seat may take its `SeatType.color` (§4.7). */
+  readonly typeColors = input<boolean>(true);
+  /** When false, seats render but do not respond to pointer or keyboard. */
+  readonly interactive = input<boolean>(true);
+
+  readonly seatActivate = output<string>();
+  readonly seatFocused = output<string>();
+  readonly seatKeydown = output<KeyboardEvent>();
+
+  protected readonly viewBox = computed(
+    () => `0 0 ${this.layout().width} ${this.layout().height}`,
+  );
+
+  protected isSelected(placed: PlacedSeat): boolean {
+    return this.selection().has(placed.seat.id);
+  }
+
+  protected fill(placed: PlacedSeat): string {
+    return seatFill(placed.seat, this.isSelected(placed), this.colors(), this.typeColors());
+  }
+
+  protected textFill(placed: PlacedSeat): string {
+    return seatTextFill(placed.seat, this.isSelected(placed), this.colors(), this.typeColors());
+  }
+
+  /** The section's single tab stop; every other seat is reachable by arrow key. */
+  protected tabIndex(placed: PlacedSeat): number {
+    if (!this.interactive()) {
+      return -1;
+    }
+    return placed.seat.id === this.focusedSeatId() ? 0 : -1;
+  }
+
+  protected ariaLabel(placed: PlacedSeat): string {
+    return this.ariaLabels().get(placed.seat.id) ?? placed.seat.label;
+  }
+
+  protected seatClasses(placed: PlacedSeat): string {
+    const seat = placed.seat;
+    return [
+      'kerusi-seat',
+      `kerusi-seat--${seat.status}`,
+      this.isSelected(placed) ? 'kerusi-seat--selected' : '',
+      seat.selectable ? '' : 'kerusi-seat--unselectable',
+      seat.accessibility?.wheelchairAccessible ? 'kerusi-seat--wheelchair' : '',
+      seat.companions.length > 0 ? 'kerusi-seat--companion' : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  /** SVG rotate() about the item's center; null when it does not rotate. */
+  protected transform(item: PlacedSeat | PlacedElement): string | null {
+    return item.rotation ? `rotate(${item.rotation} ${item.centerX} ${item.centerY})` : null;
+  }
+
+  // --- elements -------------------------------------------------------------
+
+  protected style(placed: PlacedElement) {
+    return elementStyle(placed.element.kind);
+  }
+
+  protected elementFillOf(placed: PlacedElement): string {
+    return elementFill(this.style(placed).tone, this.colors());
+  }
+
+  protected elementTextFillOf(placed: PlacedElement): string {
+    return elementTextFill(this.style(placed).tone, this.colors());
+  }
+
+  protected screenPathOf(placed: PlacedElement): string {
+    return screenPath(placed.x, placed.y, placed.width, placed.height);
+  }
+
+  /** The corner radius for a rectangular element; a stage reads as squarer. */
+  protected radiusOf(placed: PlacedElement): number {
+    return this.style(placed).shape === 'stage' ? 2 : Math.min(placed.height * 0.25, 6);
+  }
+
+  // --- interaction ----------------------------------------------------------
+
+  protected onSeatClick(placed: PlacedSeat): void {
+    if (this.interactive()) {
+      this.seatActivate.emit(placed.seat.id);
+    }
+  }
+
+  protected onSeatFocus(placed: PlacedSeat): void {
+    if (this.interactive()) {
+      this.seatFocused.emit(placed.seat.id);
+    }
+  }
+
+  protected onKeydown(event: KeyboardEvent): void {
+    if (this.interactive()) {
+      this.seatKeydown.emit(event);
+    }
+  }
+}

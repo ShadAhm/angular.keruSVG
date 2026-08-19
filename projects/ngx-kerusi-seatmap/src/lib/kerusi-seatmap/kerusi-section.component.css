@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+/* The viewBox carries the proportions; CSS only decides how wide it gets. */
+.kerusi-section-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.kerusi-seat {
+  cursor: pointer;
+  outline: none;
+}
+
+.kerusi-seat--unselectable {
+  cursor: not-allowed;
+}
+
+.kerusi-seat__label,
+.kerusi-element__label {
+  pointer-events: none;
+  user-select: none;
+  font-family: inherit;
+}
+
+.kerusi-seat__box {
+  transition: fill 120ms ease-out;
+}
+
+/* The focus ring is drawn on the seat box so it follows a rotated seat. */
+.kerusi-seat:focus-visible .kerusi-seat__box {
+  stroke: currentColor;
+  stroke-width: 2.5;
+  paint-order: stroke;
+}
+
+.kerusi-element__void {
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kerusi-seat__box {
+    transition: none;
+  }
+}

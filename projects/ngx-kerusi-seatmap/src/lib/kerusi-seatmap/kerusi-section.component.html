@@ -1,0 +1,108 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  class="kerusi-section-svg"
+  role="presentation"
+  focusable="false"
+  [attr.viewBox]="viewBox()"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <rect
+    x="0"
+    y="0"
+    [attr.width]="layout().width"
+    [attr.height]="layout().height"
+    [attr.fill]="colors().backdrop"
+  />
+
+  <!-- Elements first, so a screen or stage sits behind the seats it faces. -->
+  @for (placed of layout().elements; track placed.element.id) {
+    <g class="kerusi-element kerusi-element--{{ placed.element.kind }}" [attr.transform]="transform(placed)">
+      @switch (style(placed).shape) {
+        @case ('screen') {
+          <path [attr.d]="screenPathOf(placed)" [attr.fill]="elementFillOf(placed)" />
+        }
+        @case ('void') {
+          <rect
+            class="kerusi-element__void"
+            [attr.x]="placed.x"
+            [attr.y]="placed.y"
+            [attr.width]="placed.width"
+            [attr.height]="placed.height"
+            [attr.stroke]="elementTextFillOf(placed)"
+            fill="none"
+          />
+        }
+        @default {
+          <rect
+            [attr.x]="placed.x"
+            [attr.y]="placed.y"
+            [attr.width]="placed.width"
+            [attr.height]="placed.height"
+            [attr.rx]="radiusOf(placed)"
+            [attr.fill]="elementFillOf(placed)"
+          />
+        }
+      }
+      @if (placed.element.label && style(placed).showLabel) {
+        <text
+          class="kerusi-element__label"
+          text-anchor="middle"
+          dominant-baseline="central"
+          [attr.x]="placed.centerX"
+          [attr.y]="placed.centerY"
+          [attr.font-size]="placed.fontSize"
+          [attr.fill]="elementTextFillOf(placed)"
+        >
+          {{ placed.element.label }}
+        </text>
+      }
+    </g>
+  }
+
+  @for (placed of layout().seats; track placed.seat.id) {
+    <g
+      [class]="seatClasses(placed)"
+      role="button"
+      [attr.tabindex]="tabIndex(placed)"
+      [attr.aria-label]="ariaLabel(placed)"
+      [attr.aria-pressed]="isSelected(placed)"
+      [attr.aria-disabled]="!placed.seat.selectable"
+      [attr.data-seat-id]="placed.seat.id"
+      [attr.transform]="transform(placed)"
+      (click)="onSeatClick(placed)"
+      (focus)="onSeatFocus(placed)"
+      (keydown)="onKeydown($event)"
+    >
+      <rect
+        class="kerusi-seat__box"
+        [attr.x]="placed.x"
+        [attr.y]="placed.y"
+        [attr.width]="placed.width"
+        [attr.height]="placed.height"
+        [attr.rx]="placed.width * 0.18"
+        [attr.fill]="fill(placed)"
+      />
+      <text
+        class="kerusi-seat__label"
+        text-anchor="middle"
+        dominant-baseline="central"
+        [attr.x]="placed.centerX"
+        [attr.y]="placed.centerY"
+        [attr.font-size]="placed.fontSize"
+        [attr.fill]="textFill(placed)"
+      >
+        {{ placed.seat.label }}
+      </text>
+      @if (placed.seat.accessibility?.wheelchairAccessible) {
+        <!-- A corner marker, not a different fill: availability owns the fill. -->
+        <circle
+          class="kerusi-seat__wheelchair"
+          [attr.cx]="placed.x + placed.width * 0.82"
+          [attr.cy]="placed.y + placed.height * 0.18"
+          [attr.r]="placed.width * 0.13"
+          [attr.fill]="textFill(placed)"
+        />
+      }
+    </g>
+  }
+</svg>
