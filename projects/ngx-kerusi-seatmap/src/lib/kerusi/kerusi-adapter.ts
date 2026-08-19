@@ -4,8 +4,9 @@ import { SeatNode } from '../legacy/models/seat-node.model';
 import { SeatRow } from '../legacy/models/seat-row.model';
 import { SeatState } from '../legacy/models/seat-state.enum';
 import { Element, KerusiMap, Money, RowMeta, Seat, Section } from './kerusi-map.model';
-import { KerusiState, KerusiStateDelta, SeatStatus } from './kerusi-state.model';
+import { KerusiState, SeatStatus } from './kerusi-state.model';
 import { resolveSeatPrice } from './kerusi-price';
+import { resolveSectionLayoutMode } from './kerusi-layout-mode';
 import { validateKerusiMap, validateKerusiState } from './kerusi-validator';
 
 /** The status values a {@link KerusiState} can carry for a seat. */
@@ -121,7 +122,7 @@ export function adaptKerusiMap(
   let aspectRatio = '1:1';
 
   for (const section of sections) {
-    const freeform = sectionIsFreeform(section);
+    const freeform = resolveSectionLayoutMode(section) !== 'grid';
     if (freeform) {
       layout = 'freeform';
       aspectRatio = section.aspectRatio ?? aspectRatio;
@@ -185,20 +186,6 @@ export function kerusiToRows(
   return adaptKerusiMap(map, state, options).rows;
 }
 
-/**
- * Applies a {@link KerusiStateDelta} on top of a base {@link KerusiState},
- * returning a new state (§5.2). Every entry in `delta.changes` overwrites the
- * matching seat, including an explicit `"available"` that reverts a seat.
- * Callers are responsible for ordering deltas by `updatedAt`.
- */
-export function applyStateDelta(base: KerusiState, delta: KerusiStateDelta): KerusiState {
-  return {
-    ...base,
-    updatedAt: delta.updatedAt,
-    seats: { ...base.seats, ...delta.changes },
-  };
-}
-
 // --- internal helpers -------------------------------------------------------
 
 function selectSections(map: KerusiMap, sectionId?: string): Section[] {
@@ -243,23 +230,6 @@ function groupRows(section: Section): RowGroup[] {
 /** An ordered position within a row: either a seat or reserved aisle space. */
 type RowSlot = { kind: 'seat'; seat: Seat } | { kind: 'spacer' };
 
-/**
- * Decides whether a section renders in freeform (x/y) mode. Honors an explicit
- * `Section.layout`; otherwise infers per §4.5 — any seat carrying `x`/`y` makes
- * the section freeform.
- */
-function sectionIsFreeform(section: Section): boolean {
-  if (section.layout === 'freeform' || section.layout === 'mixed') {
-    return true;
-  }
-  if (section.layout === 'grid') {
-    return false;
-  }
-  return section.seats.some(
-    (s) => s.x !== undefined && s.x !== null && s.y !== undefined && s.y !== null,
-  );
-}
-
 /** Maps a Kerusi {@link Element} to the renderer's {@link SeatElement}. */
 function toSeatElement(element: Element): SeatElement {
   return {
@@ -279,9 +249,9 @@ function toSeatElement(element: Element): SeatElement {
  * §4.3.2) is preserved as reserved grid space.
  */
 function gridSlots(seats: Seat[]): RowSlot[] {
-  // A section may declare `layout: "grid"` while some of its seats carry only
-  // x/y (valid per §4.3.1). Those seats have no column to sort or gap-fill on,
-  // so they keep their declaration order and synthesize no spacers.
+  // Every seat in a grid section is required to carry `col` (§4.5), and the
+  // validator rejects a document where one does not — so the undefined-column
+  // branches below are defensive only, for a caller that skipped validation.
   const ordered = [...seats]
     .map((seat, order) => ({ seat, order }))
     .sort((a, b) => {

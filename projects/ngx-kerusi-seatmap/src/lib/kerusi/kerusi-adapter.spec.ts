@@ -1,4 +1,5 @@
-import { adaptKerusiMap, applyStateDelta, kerusiToRows } from './kerusi-adapter';
+import { adaptKerusiMap, kerusiToRows } from './kerusi-adapter';
+import { applyStateDelta } from './kerusi-state-store';
 import { NodeType } from '../legacy/models/node-type.enum';
 import { SeatState } from '../legacy/models/seat-state.enum';
 import { KerusiMap } from './kerusi-map.model';
@@ -185,26 +186,6 @@ describe('applyStateDelta (§5.2)', () => {
   });
 });
 
-describe('adaptKerusiMap — grid section whose seats carry only coordinates', () => {
-  const map: KerusiMap = {
-    kerusi: '1.0',
-    id: 'grid-without-cols',
-    legend: [{ id: 'standard' }],
-    sections: [
-      {
-        id: 'main',
-        layout: 'grid',
-        seats: [
-          { id: 'S1', row: '1', x: 10, y: 10, type: 'standard' },
-          { id: 'S2', row: '1', x: 20, y: 10, type: 'standard' },
-        ],
-      },
-    ],
-  };
-
-  it('keeps declaration order and synthesizes no spacers', () => {
-    const { rows } = adaptKerusiMap(map);
-    expect(rows[0].nodes.map((n) => n.type)).toEqual([NodeType.Seat, NodeType.Seat]);
-    expect(rows[0].nodes.map((n) => n.uniqueName)).toEqual(['S1', 'S2']);
-  });
-});
+// The document this file used to adapt — a `layout: "grid"` section whose seats
+// carry only x/y — is invalid under §4.5 as of the strict-layout revision. The
+// rejection is asserted in kerusi-layout-mode.spec.ts instead.

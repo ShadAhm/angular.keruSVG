@@ -44,3 +44,11 @@ export function resolveSeatPrice(seat: Seat, map: KerusiMap): Money | undefined 
 function findPriceTier(map: KerusiMap, id: string) {
   return map.priceTiers?.find((t) => t.id === id);
 }
+
+/**
+ * The price of a named tier, for rendering a legend or a price key. Returns
+ * `undefined` when the tier does not resolve.
+ */
+export function resolveTierPrice(map: KerusiMap, tierId: string | undefined): Money | undefined {
+  return tierId ? findPriceTier(map, tierId)?.price : undefined;
+}

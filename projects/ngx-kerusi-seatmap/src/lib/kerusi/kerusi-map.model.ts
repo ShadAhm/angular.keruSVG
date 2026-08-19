@@ -8,6 +8,35 @@
  * in a separate {@link KerusiState} (see kerusi-state.model.ts).
  */
 
+/**
+ * A label that may be a plain string or a BCP-47 locale map, e.g.
+ * `{ "en": "Orchestra", "ms": "Orkestra" }`. Resolve with
+ * `resolveLocalizedText` (§4.1, §4.7).
+ */
+export type LocalizedText = string | Record<string, string>;
+
+/**
+ * Structured accessibility properties for a seat (§4.3.4). All members are
+ * OPTIONAL, per the progressive-enhancement principle (§2): a map with no
+ * accessibility needs to express simply omits `accessibility` on every seat.
+ *
+ * These are first-class fields, not `attributes` — an attribute tag like
+ * "wheelchair" is free text a consumer cannot rely on.
+ */
+export interface Accessibility {
+  /** Seat or space usable by a wheelchair user. */
+  wheelchairAccessible?: boolean;
+  /** Which armrest lifts, for transfer from a mobility device. */
+  transferArmrest?: 'left' | 'right' | 'both' | 'fixed' | 'none';
+  /** Reachable via aisle-chair transfer. */
+  aisleChairCompatible?: boolean;
+  /**
+   * The occupant is expected to need an adjacent companion. Pair with
+   * `Seat.companions` (§4.6) to link the actual companion seat.
+   */
+  companionRequired?: boolean;
+}
+
 /** A monetary amount, in minor units to avoid floating-point error (§4.8). */
 export interface Money {
   /** REQUIRED. Minor units (e.g. cents), to avoid floating-point error. */
@@ -29,7 +58,7 @@ export interface PriceTier {
 export interface SeatType {
   /** REQUIRED. e.g. "standard" | "recliner" | "wheelchair" | "business". */
   id: string;
-  label?: string | Record<string, string>;
+  label?: LocalizedText;
   /** Suggested render color, hex. Non-normative hint. */
   color?: string;
   defaultPriceTier?: string;
@@ -77,8 +106,13 @@ export interface Seat {
   price?: Money;
   /** ids of other seats that must be booked together (couple/family bays). */
   companions?: string[];
-  /** Free, non-exclusive tags: "aisle" | "window" | "extra-legroom" | ... */
+  /**
+   * Free, non-exclusive tags: "aisle" | "window" | "extra-legroom" | ...
+   * Descriptive only; attributes MUST NOT independently affect price (§4.3.3).
+   */
   attributes?: string[];
+  /** Structured accessibility properties (§4.3.4). */
+  accessibility?: Accessibility;
   metadata?: Record<string, unknown>;
 }
 
@@ -112,10 +146,22 @@ export interface Section {
   /** REQUIRED. */
   id: string;
   /** String, or locale map: `{ "en": "Orchestra", "ms": "Orkestra" }`. */
-  label?: string | Record<string, string>;
+  label?: LocalizedText;
   /** Display order among sections. */
   index?: number;
-  /** Rendering hint (§4.5). */
+  /**
+   * A strict, validated constraint on how this section's seats are positioned
+   * — NOT a rendering hint (§4.5). Every seat MUST conform:
+   *
+   *  - `grid`     — every seat has `col`; no seat has `x` or `y`.
+   *  - `freeform` — every seat has both `x` and `y`; no seat has `col`.
+   *  - `mixed`    — every seat has `col` AND both `x` and `y`; `x`/`y` places
+   *                 the seat and `col` gives its logical adjacency.
+   *
+   * Omitted, the mode is INFERRED from the seats; a section whose seats are
+   * inconsistent is invalid and MUST be rejected. A free-text `row` is allowed
+   * in every mode — it carries no positional information.
+   */
   layout?: 'grid' | 'freeform' | 'mixed';
   /**
    * "width:height", e.g. "16:9". Meaningful only for freeform/mixed sections.
