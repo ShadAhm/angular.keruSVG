@@ -30,6 +30,11 @@
   transition: fill 120ms ease-out;
 }
 
+.kerusi-seat__backrest {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
 /* The focus ring is drawn on the seat box so it follows a rotated seat. */
 .kerusi-seat:focus-visible .kerusi-seat__box {
   stroke: currentColor;

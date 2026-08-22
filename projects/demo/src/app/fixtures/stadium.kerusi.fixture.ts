@@ -42,7 +42,7 @@ function stand(
         col: c + 1,
         x: 50 + along.x * offset + out.x * depth,
         y: 50 + along.y * offset + out.y * depth,
-        rotation: angle,
+        rotation: angle + 180,
         type,
       });
     }

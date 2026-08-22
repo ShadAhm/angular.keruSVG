@@ -107,6 +107,11 @@ export class KerusiSectionComponent {
     return item.rotation ? `rotate(${item.rotation} ${item.centerX} ${item.centerY})` : null;
   }
 
+  /** Cancels the parent <g>'s rotation so the label stays upright and stays put. */
+  protected counterRotate(item: PlacedSeat | PlacedElement): string | null {
+    return item.rotation ? `rotate(${-item.rotation} ${item.centerX} ${item.centerY})` : null;
+  }
+
   // --- elements -------------------------------------------------------------
 
   protected style(placed: PlacedElement) {
