@@ -3,21 +3,16 @@ import {
   formatMoney,
   KerusiSeatmapComponent,
   KerusiViolation,
-  NodeType,
   SeatDisallowed,
-  SeatPickerComponent,
-  SeatRow,
-  SeatState,
   summarizeSelection,
   buildRenderModel,
 } from 'ngx-kerusi-seatmap';
 import { DEMO_LOCALES, Scenario, SCENARIOS } from './scenarios';
-import { SAMPLE_ROWS } from './fixtures/seat-data.fixture';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [KerusiSeatmapComponent, SeatPickerComponent],
+  imports: [KerusiSeatmapComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -94,22 +89,6 @@ export class App {
       elements: section.elements.length,
     })),
   );
-
-  // --- The deprecated SeatRow[] API, kept working and shown as such. ---------
-
-  protected readonly legacyRows = signal<SeatRow[]>(SAMPLE_ROWS);
-
-  protected readonly legacySelected = computed(() =>
-    this.legacyRows()
-      .flatMap((row) => row.nodes)
-      .filter((n) => n.type === NodeType.Seat && n.selected === SeatState.Selected)
-      .map((n) => n.displayName ?? n.uniqueName ?? '?'),
-  );
-
-  /** The legacy component mutates nodes in place, so the signal must be re-set. */
-  protected onLegacyChanged(): void {
-    this.legacyRows.set([...this.legacyRows()]);
-  }
 }
 
 const DISALLOWED_TEXT: Record<SeatDisallowed['reason'], string> = {

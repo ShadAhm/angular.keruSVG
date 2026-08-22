@@ -16,6 +16,3 @@ export * from './kerusi-locale';
 export * from './kerusi-price';
 export * from './kerusi-validator';
 export * from './kerusi-state-store';
-
-/** @deprecated The pre-1.0 `SeatRow[]` adapter. Use `<kerusi-seatmap>` directly. */
-export * from './kerusi-adapter';

@@ -5,7 +5,7 @@ import { KerusiMap, KerusiState, Seat } from 'ngx-kerusi-seatmap';
 // non-bookable elements (screen + exits), freeform x/y placement with per-seat
 // rotation (the fan curve), multiple seat types and price tiers, companion
 // (couple) seats, accessible seats, aisles as simple absences, and the full
-// availability vocabulary. The demo feeds it through `adaptKerusiMap` — the
+// availability vocabulary. The demo feeds it through `buildRenderModel` — the
 // same path any Kerusi document would take.
 
 const STANDARD_ROWS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];

@@ -342,34 +342,6 @@ main {
   line-height: 1.5;
 }
 
-/* --- legacy card --------------------------------------------------------- */
-
-.legacy {
-  margin-top: 2rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.5rem;
-}
-
-.legacy h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1.05rem;
-}
-
-.legacy kerusi-seatpicker {
-  display: block;
-  margin-top: 1rem;
-}
-
-/* The deprecated picker draws at a fixed pixel canvas and cannot scale, so on
-   a narrow viewport it scrolls inside its own box rather than pushing the page
-   sideways. <kerusi-seatmap> needs none of this — it sizes itself. */
-.legacy-stage {
-  margin-top: 1rem;
-  overflow-x: auto;
-}
-
 .chips {
   display: flex;
   flex-wrap: wrap;

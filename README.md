@@ -89,12 +89,11 @@ is a feature-by-feature audit; the highlights:
 
 ## Repository layout
 
-| Path                                     | What it is                                                |
-| ---------------------------------------- | --------------------------------------------------------- |
-| `projects/ngx-kerusi-seatmap/`           | The publishable library.                                  |
-| `projects/demo/`                         | Demo app, deployed to GitHub Pages.                       |
-| `docs/`                                  | Format guide and the conformance report.                  |
-| `legacy/original-angularjs-directive.js` | The original AngularJS 1.x directive, kept for reference. |
+| Path                            | What it is                          |
+| -------------------------------- | ------------------------------------ |
+| `projects/ngx-kerusi-seatmap/`  | The publishable library.            |
+| `projects/demo/`                | Demo app, deployed to GitHub Pages. |
+| `docs/`                         | Format guide and the conformance report. |
 
 ## Develop
 
@@ -118,9 +117,8 @@ Releases are cut manually (CI never publishes to npm):
 
 This began as a small AngularJS 1.x directive called `keruSVG`, revived as a
 modern standalone Angular library. Version 1.0 renamed it to
-`ngx-kerusi-seatmap` and rebuilt it around the Kerusi format; the pre-1.0
-`<kerusi-seatpicker>` and its `SeatRow[]` model are deprecated but still work.
-See [CHANGELOG.md](CHANGELOG.md) for the migration.
+`ngx-kerusi-seatmap` and rebuilt it around the Kerusi format. See
+[CHANGELOG.md](CHANGELOG.md) for details.
 
 ## License
 
