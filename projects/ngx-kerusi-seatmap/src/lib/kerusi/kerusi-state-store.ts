@@ -49,23 +49,6 @@ export const DEFAULT_SEQUENCE_READER: SequenceReader = (delta) => {
 };
 
 /**
- * Applies a {@link KerusiStateDelta} on top of a base {@link KerusiState},
- * returning a new state (§5.2). Every entry in `delta.changes` overwrites the
- * matching seat, including an explicit `"available"` that reverts a seat.
- *
- * @deprecated Ordering is the caller's problem here. Prefer
- * {@link applyStateDeltaOrdered}, which discards a stale or out-of-scope delta
- * instead of silently rewinding the state.
- */
-export function applyStateDelta(base: KerusiState, delta: KerusiStateDelta): KerusiState {
-  return {
-    ...base,
-    updatedAt: delta.updatedAt,
-    seats: { ...base.seats, ...delta.changes },
-  };
-}
-
-/**
  * Applies a delta with the §5.2 ordering rules enforced.
  *
  * Three things are checked, in order:
@@ -109,7 +92,11 @@ export function applyStateDeltaOrdered(
     };
   }
 
-  const state = applyStateDelta(base, delta);
+  const state: KerusiState = {
+    ...base,
+    updatedAt: delta.updatedAt,
+    seats: { ...base.seats, ...delta.changes },
+  };
 
   const sequenceOf = opts.sequenceOf ?? DEFAULT_SEQUENCE_READER;
   const seq = sequenceOf(delta);

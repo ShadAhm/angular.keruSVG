@@ -184,24 +184,4 @@ Deltas that are stale, duplicate or scoped to another session are discarded.
 
 ---
 
-## Deprecated: the pre-1.0 `SeatRow[]` API
-
-`<kerusi-seatpicker>` (`SeatPickerComponent`), `SeatRow`, `SeatNode`,
-`SeatElement`, `NodeType`, `SeatState`, `SeatPickerColors`, `computeLayout`,
-`computeFreeformLayout`, `adaptKerusiMap` and `kerusiToRows` all still work
-unchanged and will not be removed before 2.0.
-
-They have real limitations `<kerusi-seatmap>` does not: every section flattens
-into one continuous run of rows with a single layout mode and aspect ratio for
-the whole map, elements only render in freeform mode, nothing in the document
-affects a seat's colour, there is no keyboard or screen-reader support, and
-`SeatNode.selected` is mutated in place — which is why callers have to re-set
-their rows signal after every click.
-
-One behaviour did change: `adaptKerusiMap` now validates `Section.layout`
-strictly, so a document that previously adapted may throw. See the
-[CHANGELOG](https://github.com/ShadAhm/ngx-kerusi-seatmap/blob/master/CHANGELOG.md).
-
----
-
 MIT © Arshad Ahmad

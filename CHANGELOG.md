@@ -8,8 +8,7 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 The library is renamed and rebuilt around the Kerusi Seat Map & Availability
 Format. `KerusiMap` and `KerusiState` are now the renderer's primary input
-rather than something adapted into a grid model, and the pre-1.0 `SeatRow[]`
-API is kept working as a deprecated compatibility layer.
+rather than something adapted into a grid model.
 
 The unreleased 0.2 work described in the previous edition of this file is
 folded into this release.
@@ -54,9 +53,6 @@ folded into this release.
    `violations`, carrying every finding from the same pass. The thrown error is
    still the first in document order, but a document with several faults may now
    report a newly added rule ahead of one that existed before.
-
-8. Renaming the legacy `SeatPickerComponent`'s selector and CSS classes (item 2)
-   is the only behavioural change to the pre-1.0 path other than item 3.
 
 ### Added
 
@@ -126,40 +122,14 @@ folded into this release.
   size of orchestra seats.
 - **`formatMoney` reads the currency's minor-unit exponent** instead of dividing
   by 100, which rendered JPY 100× too small and KWD 10× too large.
-- Element ids survive into the render model; the pre-1.0 adapter dropped them.
+- Element ids now survive into the render model.
 - `CSS.escape` is no longer used to locate a seat node — it is undefined in
   jsdom and under SSR.
-
-### Deprecated
-
-Kept working, removed no earlier than 2.0: `SeatPickerComponent`
-(`<kerusi-seatpicker>`), `SeatRow`, `SeatNode`, `SeatElement`, `NodeType`,
-`SeatState`, `SeatPickerColors`, `computeLayout`, `computeFreeformLayout`,
-`adaptKerusiMap`, `kerusiToRows`, `AdaptResult`, `AdaptedSeat` and
-`applyStateDelta` (superseded by `applyStateDeltaOrdered`).
-
-`AdaptResult.layout` and `AdaptResult.aspectRatio` remain single-valued and are
-therefore wrong for a multi-section map; only the last freeform section's ratio
-survives. This is inherent to the legacy model and will not be fixed.
-
-### Migration
-
-```html
-<!-- Before -->
-<keruc-seatpicker [rows]="kerusiToRows(map, state)" />
-
-<!-- After -->
-<kerusi-seatmap [map]="map" [state]="state" [(selection)]="picked" />
-```
-
-Callers that only rename the import and the selector keep working. Moving to
-`<kerusi-seatmap>` also removes the `rows.set([...rows()])` dance the old
-component required, since it no longer mutates its nodes.
 
 ## [0.1.0] - 2026-08-16
 
 First release as a modern Angular library, superseding the never-released
-AngularJS 1.x directive (kept in `legacy/`).
+AngularJS 1.x directive.
 
 ### Added
 

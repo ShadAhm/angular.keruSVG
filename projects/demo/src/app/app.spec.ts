@@ -41,8 +41,4 @@ describe('App', () => {
     const sectionCount = SCENARIOS[0].map.sections.length;
     expect(el.querySelectorAll('kerusi-section svg')).toHaveLength(sectionCount);
   });
-
-  it('keeps the deprecated SeatRow[] picker working alongside it', () => {
-    expect(el.querySelector('kerusi-seatpicker')).not.toBeNull();
-  });
 });

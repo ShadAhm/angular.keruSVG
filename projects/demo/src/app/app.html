@@ -174,31 +174,6 @@
       <pre><code>{{ sourceJson() }}</code></pre>
     </details>
   </section>
-
-  <section class="legacy" aria-labelledby="legacy-heading">
-    <h2 id="legacy-heading">The pre-1.0 API still works</h2>
-    <p class="hint">
-      <code>&lt;kerusi-seatpicker&gt;</code> and its <code>SeatRow[]</code> model are deprecated but
-      unchanged, so existing code keeps running. It flattens every section into one run of rows and
-      mutates its nodes in place — which is why this card has to re-set its signal after each click.
-    </p>
-    <div class="legacy-stage">
-      <kerusi-seatpicker
-        [rows]="legacyRows()"
-        [canvasWidth]="420"
-        [canvasHeight]="300"
-        (selected)="onLegacyChanged()"
-        (deselected)="onLegacyChanged()"
-      />
-    </div>
-    @if (legacySelected().length) {
-      <ul class="chips">
-        @for (name of legacySelected(); track name) {
-          <li class="chip">{{ name }}</li>
-        }
-      </ul>
-    }
-  </section>
 </main>
 
 <footer class="site-footer">

@@ -261,21 +261,3 @@ const session: KerusiSession = {
   startsAt: '2026-08-19T19:30:00+08:00',
 };
 ```
-
-## Migrating from the `SeatRow[]` adapter
-
-Pre-1.0 the only entry point was `adaptKerusiMap`, which flattened a document
-into the legacy grid model:
-
-```ts
-// Before
-<kerusi-seatpicker [rows]="kerusiToRows(map, state)" />
-
-// After
-<kerusi-seatmap [map]="map" [state]="state" />
-```
-
-The adapter still works, but it cannot represent a multi-section venue: one
-layout mode and one aspect ratio apply to the whole map, elements render only in
-freeform sections, and element ids are dropped. It also now validates
-`Section.layout` strictly, so a document that previously adapted may throw.

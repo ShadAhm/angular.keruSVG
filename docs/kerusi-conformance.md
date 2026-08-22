@@ -20,10 +20,6 @@ renderer, so it defines no transport, and it ships no JSON Schema.
 
 Status key: ✅ supported · ⚠️ partial · ❌ not supported
 
-> The pre-1.0 `SeatRow[]` renderer (`<kerusi-seatpicker>`, `adaptKerusiMap`) is
-> still shipped and still has the limits the previous edition of this report
-> described. Everything below assesses `<kerusi-seatmap>`, the current renderer.
-
 ---
 
 ## §3 Document types
