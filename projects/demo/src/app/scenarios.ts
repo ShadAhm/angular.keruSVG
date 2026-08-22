@@ -1,6 +1,10 @@
 import { KerusiMap, KerusiSession, KerusiState } from 'ngx-kerusi-seatmap';
 import { AIRCRAFT_MAP, AIRCRAFT_SESSION, AIRCRAFT_STATE } from './fixtures/aircraft.kerusi.fixture';
 import { CINEMA_MAP, CINEMA_SESSION, CINEMA_STATE } from './fixtures/cinema.kerusi.fixture';
+import {
+  LECTURE_THEATRE_MAP,
+  LECTURE_THEATRE_STATE,
+} from './fixtures/lecture-theatre.kerusi.fixture';
 import { STADIUM_MAP, STADIUM_STATE } from './fixtures/stadium.kerusi.fixture';
 import { TRAIN_MAP, TRAIN_SESSION, TRAIN_STATE } from './fixtures/train.kerusi.fixture';
 
@@ -96,6 +100,24 @@ export const SCENARIOS: readonly Scenario[] = [
     map: STADIUM_MAP,
     state: STADIUM_STATE,
     seatSize: 22,
+  },
+  {
+    id: 'lecture-theatre',
+    name: 'Lecture Theatre',
+    domain: 'theatre',
+    blurb:
+      'Rows are concentric arcs around a point above the screen, each seat rotated to ' +
+      'face it — the fan widens toward the back the way a real raked hall does.',
+    highlights: [
+      'layout: "freeform" — every seat has x and y, no seat has col',
+      'Per-seat rotation comes from real polar geometry, not a hand-tuned curve',
+      'A constant seat pitch, not seat count, is what a row holds constant',
+      'aspectRatio "16:9" fixes the section proportions',
+      'An accessible pair sits at each end of the back row',
+    ],
+    map: LECTURE_THEATRE_MAP,
+    state: LECTURE_THEATRE_STATE,
+    seatSize: 26,
   },
 ];
 
