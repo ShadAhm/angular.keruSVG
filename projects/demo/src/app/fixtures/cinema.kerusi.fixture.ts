@@ -1,39 +1,27 @@
 import { KerusiMap, KerusiSession, KerusiState } from 'ngx-kerusi-seatmap';
 
 /**
- * A cinema hall in `freeform` mode: rows arc around the screen and each seat is
- * angled to face it, which no row/column grid can express. The back row is
- * love seats, linked in symmetric `companions` pairs so they book together.
+ * A cinema hall in `grid` mode: straight rows split by two aisles into a
+ * left wing, a center block, and a right wing — the classic printed seating
+ * chart, not a curved auditorium. The back row is love seats, linked in
+ * symmetric `companions` pairs so they book together.
  *
- * Exercises: freeform positioning, per-seat `rotation`, `aspectRatio`, screen
- * and exit elements, price tiers, companions, and all four availability states.
+ * Exercises: grid positioning, multiple sections-worth of column reuse via
+ * skipped aisle columns, a dedicated non-seat row for the screen, price
+ * tiers, companions, and all four availability states.
  */
 
-/** Seats along an arc, tilted to face the screen at the top of the section. */
-function arc(
-  row: string,
-  count: number,
-  y: number,
-  curve: number,
-  type: string,
-  startCol = 1,
-): KerusiMap['sections'][number]['seats'] {
-  const seats: KerusiMap['sections'][number]['seats'] = [];
-  const spread = 62;
-  for (let i = 0; i < count; i++) {
-    // -1 at the left edge, +1 at the right.
-    const t = count === 1 ? 0 : (i / (count - 1)) * 2 - 1;
-    seats.push({
-      id: `${row}${i + startCol}`,
-      label: `${i + startCol}`,
-      row,
-      x: 50 + t * (spread / 2),
-      y: y - curve * (1 - t * t),
-      rotation: t * 14,
-      type,
-    });
-  }
-  return seats;
+/** A 12-seat standard row: two-seat wings at cols 1–2 / 13–14, an 8-seat
+ * center block at cols 4–11, aisles at the skipped columns either side. */
+function standardRow(row: string, type: string): KerusiMap['sections'][number]['seats'] {
+  const cols = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14];
+  return cols.map((col, i) => ({
+    id: `${row}${i + 1}`,
+    label: `${i + 1}`,
+    row,
+    col,
+    type,
+  }));
 }
 
 export const CINEMA_MAP: KerusiMap = {
@@ -77,34 +65,43 @@ export const CINEMA_MAP: KerusiMap = {
     {
       id: 'house',
       label: { en: 'Hall 3', ms: 'Dewan 3' },
-      layout: 'freeform',
-      aspectRatio: '16:9',
+      layout: 'grid',
       rows: [
-        { id: 'A', label: 'A', index: 0 },
-        { id: 'B', label: 'B', index: 1 },
-        { id: 'C', label: 'C', index: 2 },
-        { id: 'D', label: 'D', index: 3 },
-        { id: 'E', label: 'E', index: 4 },
-        { id: 'L', label: 'L', index: 5 },
+        // A row-less row, purely so the screen has somewhere to sit above row A.
+        { id: 'screen-row', label: '', index: 0 },
+        { id: 'A', label: 'A', index: 1 },
+        { id: 'B', label: 'B', index: 2 },
+        { id: 'C', label: 'C', index: 3 },
+        { id: 'D', label: 'D', index: 4 },
+        { id: 'E', label: 'E', index: 5 },
+        { id: 'L', label: 'L', index: 6 },
       ],
       elements: [
-        { id: 'screen', kind: 'screen', label: 'SCREEN', x: 50, y: 7, width: 66, height: 4 },
-        { id: 'exit-left', kind: 'exit', label: 'EXIT', x: 6, y: 82, width: 8, height: 5 },
-        { id: 'exit-right', kind: 'exit', label: 'EXIT', x: 94, y: 82, width: 8, height: 5 },
+        {
+          id: 'screen',
+          kind: 'screen',
+          label: 'SCREEN',
+          row: 'screen-row',
+          col: 1,
+          width: 14,
+          // A thin bar, not a full row-tall cell — the screen shape's arc
+          // bulges in proportion to this height (§ screenPath).
+          height: 0.3,
+        },
+        { id: 'exit-left', kind: 'exit', label: 'EXIT', row: 'L', col: 0 },
+        { id: 'exit-right', kind: 'exit', label: 'EXIT', row: 'L', col: 15 },
       ],
       seats: [
-        ...arc('A', 10, 34, 5, 'standard'),
-        ...arc('B', 11, 45, 5, 'standard'),
-        ...arc('C', 12, 56, 5, 'premium'),
-        ...arc('D', 12, 67, 5, 'premium'),
+        ...standardRow('A', 'standard'),
+        ...standardRow('B', 'standard'),
+        ...standardRow('C', 'premium'),
+        ...standardRow('D', 'premium'),
         // Row E leaves a wheelchair bay at each end, with its companion seat.
         {
           id: 'E1',
           label: '1',
           row: 'E',
-          x: 21,
-          y: 77,
-          rotation: -12,
+          col: 1,
           type: 'wheelchair',
           companions: ['E2'],
           attributes: ['aisle'],
@@ -115,37 +112,18 @@ export const CINEMA_MAP: KerusiMap = {
             companionRequired: true,
           },
         },
-        {
-          id: 'E2',
-          label: '2',
-          row: 'E',
-          x: 29,
-          y: 78,
-          rotation: -8,
-          type: 'premium',
-          companions: ['E1'],
-        },
-        ...arc('E', 5, 79, 1, 'premium', 3).map((seat, i) => ({
-          ...seat,
-          x: 40 + i * 5,
-        })),
-        {
-          id: 'E8',
-          label: '8',
-          row: 'E',
-          x: 71,
-          y: 78,
-          rotation: 8,
-          type: 'premium',
-          companions: ['E9'],
-        },
+        { id: 'E2', label: '2', row: 'E', col: 2, type: 'premium', companions: ['E1'] },
+        { id: 'E3', label: '3', row: 'E', col: 4, type: 'premium' },
+        { id: 'E4', label: '4', row: 'E', col: 5, type: 'premium' },
+        { id: 'E5', label: '5', row: 'E', col: 6, type: 'premium' },
+        { id: 'E6', label: '6', row: 'E', col: 7, type: 'premium' },
+        { id: 'E7', label: '7', row: 'E', col: 8, type: 'premium' },
+        { id: 'E8', label: '8', row: 'E', col: 10, type: 'premium', companions: ['E9'] },
         {
           id: 'E9',
           label: '9',
           row: 'E',
-          x: 79,
-          y: 77,
-          rotation: 12,
+          col: 11,
           type: 'wheelchair',
           companions: ['E8'],
           attributes: ['aisle'],
@@ -156,67 +134,13 @@ export const CINEMA_MAP: KerusiMap = {
             companionRequired: true,
           },
         },
-        // Love seats: three symmetric pairs across the back row.
-        {
-          id: 'L1',
-          label: '1',
-          row: 'L',
-          x: 28,
-          y: 90,
-          rotation: -10,
-          type: 'sofa',
-          companions: ['L2'],
-        },
-        {
-          id: 'L2',
-          label: '2',
-          row: 'L',
-          x: 36,
-          y: 89,
-          rotation: -6,
-          type: 'sofa',
-          companions: ['L1'],
-        },
-        {
-          id: 'L3',
-          label: '3',
-          row: 'L',
-          x: 46,
-          y: 88,
-          rotation: -2,
-          type: 'sofa',
-          companions: ['L4'],
-        },
-        {
-          id: 'L4',
-          label: '4',
-          row: 'L',
-          x: 54,
-          y: 88,
-          rotation: 2,
-          type: 'sofa',
-          companions: ['L3'],
-        },
-        {
-          id: 'L5',
-          label: '5',
-          row: 'L',
-          x: 64,
-          y: 89,
-          rotation: 6,
-          type: 'sofa',
-          companions: ['L6'],
-        },
-        {
-          id: 'L6',
-          label: '6',
-          row: 'L',
-          x: 72,
-          y: 90,
-          rotation: 10,
-          type: 'sofa',
-          companions: ['L5'],
-        },
+        // Love seats: three symmetric pairs, an aisle gap between each pair.
+        { id: 'L1', label: '1', row: 'L', col: 4, type: 'sofa', companions: ['L2'] },
+        { id: 'L2', label: '2', row: 'L', col: 5, type: 'sofa', companions: ['L1'] },
+        { id: 'L3', label: '3', row: 'L', col: 7, type: 'sofa', companions: ['L4'] },
+        { id: 'L4', label: '4', row: 'L', col: 8, type: 'sofa', companions: ['L3'] },
+        { id: 'L5', label: '5', row: 'L', col: 10, type: 'sofa', companions: ['L6'] },
+        { id: 'L6', label: '6', row: 'L', col: 11, type: 'sofa', companions: ['L5'] },
       ],
     },
   ],

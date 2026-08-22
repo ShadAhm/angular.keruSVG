@@ -56,6 +56,7 @@
           [attr.y]="placed.centerY"
           [attr.font-size]="placed.fontSize"
           [attr.fill]="elementTextFillOf(placed)"
+          [attr.transform]="counterRotate(placed)"
         >
           {{ placed.element.label }}
         </text>
@@ -86,6 +87,16 @@
         [attr.rx]="placed.width * 0.18"
         [attr.fill]="fill(placed)"
       />
+      <!-- The seat's back edge (unrotated = bottom, opposite the front it faces), so an SVG rotation is visible on the shape itself. -->
+      <rect
+        class="kerusi-seat__backrest"
+        [attr.x]="placed.x + placed.width * 0.2"
+        [attr.y]="placed.y + placed.height * 0.76"
+        [attr.width]="placed.width * 0.6"
+        [attr.height]="placed.height * 0.16"
+        [attr.rx]="placed.height * 0.08"
+        [attr.fill]="textFill(placed)"
+      />
       <text
         class="kerusi-seat__label"
         text-anchor="middle"
@@ -94,6 +105,7 @@
         [attr.y]="placed.centerY"
         [attr.font-size]="placed.fontSize"
         [attr.fill]="textFill(placed)"
+        [attr.transform]="counterRotate(placed)"
       >
         {{ placed.seat.label }}
       </text>

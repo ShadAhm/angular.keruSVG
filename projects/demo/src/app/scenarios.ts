@@ -1,9 +1,7 @@
 import { KerusiMap, KerusiSession, KerusiState } from 'ngx-kerusi-seatmap';
 import { AIRCRAFT_MAP, AIRCRAFT_SESSION, AIRCRAFT_STATE } from './fixtures/aircraft.kerusi.fixture';
 import { CINEMA_MAP, CINEMA_SESSION, CINEMA_STATE } from './fixtures/cinema.kerusi.fixture';
-import { COACH_MAP, COACH_STATE } from './fixtures/coach.kerusi.fixture';
 import { STADIUM_MAP, STADIUM_STATE } from './fixtures/stadium.kerusi.fixture';
-import { THEATRE_MAP, THEATRE_STATE } from './fixtures/theatre.kerusi.fixture';
 import { TRAIN_MAP, TRAIN_SESSION, TRAIN_STATE } from './fixtures/train.kerusi.fixture';
 
 /** One showcased venue: its documents, and what about the standard it shows. */
@@ -30,12 +28,12 @@ export const SCENARIOS: readonly Scenario[] = [
     name: 'Cinema',
     domain: 'cinema',
     blurb:
-      'Rows arc around the screen and every seat is angled to face it — geometry no ' +
-      'row-and-column grid can express.',
+      'A straight grid split by two aisles into a left wing, a center block, and a ' +
+      'right wing — the classic printed seating chart.',
     highlights: [
-      'layout: "freeform" — every seat has x and y, no seat has col',
-      'Per-seat rotation follows the curve',
-      'aspectRatio "16:9" fixes the section proportions',
+      'layout: "grid" — every seat has col, no seat has x or y',
+      'Two aisles as skipped columns split each row into three blocks',
+      'A dedicated row-less row gives the screen somewhere to sit',
       'Screen and exits are non-bookable Elements',
       'Love seats are symmetric companions — they book as a pair',
       'A wheelchair bay declares accessibility, not an attribute tag',
@@ -43,7 +41,6 @@ export const SCENARIOS: readonly Scenario[] = [
     map: CINEMA_MAP,
     state: CINEMA_STATE,
     session: CINEMA_SESSION,
-    seatSize: 26,
   },
   {
     id: 'aircraft',
@@ -65,22 +62,22 @@ export const SCENARIOS: readonly Scenario[] = [
     session: AIRCRAFT_SESSION,
   },
   {
-    id: 'theatre',
-    name: 'Theatre',
-    domain: 'theatre',
+    id: 'train',
+    name: 'Train',
+    domain: 'train',
     blurb:
-      'Four tiers, four Sections — a freeform orchestra above three grid tiers, each ' +
-      'with its own proportions.',
+      'Two carriages, two Sections. Carriage B is table bays, where four seats face ' +
+      'each other around a fixture that cannot be booked.',
     highlights: [
-      'Sections as real render units, each its own <svg>',
-      'A freeform orchestra and grid tiers in ONE map',
-      'Per-section aspectRatio and Section.index ordering',
-      'Localized Section.label — switch the locale to see it',
-      'A labelled gap Element over the auditorium',
+      'One Section per carriage',
+      'Tables are Elements spanning grid cells',
+      'forward-facing / rear-facing as attributes',
+      'An accessible bay with its required companion seat',
+      'Its KerusiState is scoped by sessionId, not mapId',
     ],
-    map: THEATRE_MAP,
-    state: THEATRE_STATE,
-    seatSize: 20,
+    map: TRAIN_MAP,
+    state: TRAIN_STATE,
+    session: TRAIN_SESSION,
   },
   {
     id: 'stadium',
@@ -99,40 +96,6 @@ export const SCENARIOS: readonly Scenario[] = [
     map: STADIUM_MAP,
     state: STADIUM_STATE,
     seatSize: 22,
-  },
-  {
-    id: 'coach',
-    name: 'Coach',
-    domain: 'bus',
-    blurb:
-      'A 2+1 sleeper coach. It declares no layout at all — the mode is inferred from ' +
-      'the seats.',
-    highlights: [
-      'layout omitted — inferred as "grid" per §4.5',
-      'Driver bay, door, WC and luggage as Elements',
-      'A skipped column is the aisle',
-      'Front row priced by its own tier',
-    ],
-    map: COACH_MAP,
-    state: COACH_STATE,
-  },
-  {
-    id: 'train',
-    name: 'Train',
-    domain: 'train',
-    blurb:
-      'Two carriages, two Sections. Carriage B is table bays, where four seats face ' +
-      'each other around a fixture that cannot be booked.',
-    highlights: [
-      'One Section per carriage',
-      'Tables are Elements spanning grid cells',
-      'forward-facing / rear-facing as attributes',
-      'An accessible bay with its required companion seat',
-      'Its KerusiState is scoped by sessionId, not mapId',
-    ],
-    map: TRAIN_MAP,
-    state: TRAIN_STATE,
-    session: TRAIN_SESSION,
   },
 ];
 

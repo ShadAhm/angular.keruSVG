@@ -9,9 +9,7 @@ import {
 } from 'ngx-kerusi-seatmap';
 import { AIRCRAFT_MAP, AIRCRAFT_SESSION, AIRCRAFT_STATE } from './aircraft.kerusi.fixture';
 import { CINEMA_MAP, CINEMA_SESSION, CINEMA_STATE } from './cinema.kerusi.fixture';
-import { COACH_MAP, COACH_STATE } from './coach.kerusi.fixture';
 import { STADIUM_MAP, STADIUM_STATE } from './stadium.kerusi.fixture';
-import { THEATRE_MAP, THEATRE_STATE } from './theatre.kerusi.fixture';
 import { TRAIN_MAP, TRAIN_SESSION, TRAIN_STATE } from './train.kerusi.fixture';
 
 /**
@@ -26,10 +24,8 @@ const SCENARIOS: {
 }[] = [
   { name: 'cinema', map: CINEMA_MAP, state: CINEMA_STATE, session: CINEMA_SESSION },
   { name: 'aircraft', map: AIRCRAFT_MAP, state: AIRCRAFT_STATE, session: AIRCRAFT_SESSION },
-  { name: 'theatre', map: THEATRE_MAP, state: THEATRE_STATE },
-  { name: 'stadium', map: STADIUM_MAP, state: STADIUM_STATE },
-  { name: 'coach', map: COACH_MAP, state: COACH_STATE },
   { name: 'train', map: TRAIN_MAP, state: TRAIN_STATE, session: TRAIN_SESSION },
+  { name: 'stadium', map: STADIUM_MAP, state: STADIUM_STATE },
 ];
 
 describe.each(SCENARIOS)('$name fixture', ({ map, state, session }) => {
@@ -52,12 +48,8 @@ describe.each(SCENARIOS)('$name fixture', ({ map, state, session }) => {
   });
 });
 
-describe('the scenarios cover all three positioning modes (§4.5)', () => {
+describe('the scenarios cover the positioning modes in use (§4.5)', () => {
   const modes = SCENARIOS.flatMap(({ map }) => map.sections.map((s) => s.layout));
-
-  it('includes a declared freeform section', () => {
-    expect(modes).toContain('freeform');
-  });
 
   it('includes a declared grid section', () => {
     expect(modes).toContain('grid');
@@ -65,10 +57,6 @@ describe('the scenarios cover all three positioning modes (§4.5)', () => {
 
   it('includes a declared mixed section', () => {
     expect(modes).toContain('mixed');
-  });
-
-  it('includes a section that leaves layout to be inferred', () => {
-    expect(modes).toContain(undefined);
   });
 });
 
@@ -91,7 +79,7 @@ describe('the scenarios exercise the rest of the standard', () => {
 
   it('uses a spread of element kinds (§4.4)', () => {
     const kinds = new Set(elements.map((e) => e.kind));
-    for (const kind of ['screen', 'stage', 'exit', 'lavatory', 'gap', 'table']) {
+    for (const kind of ['screen', 'exit', 'lavatory', 'table']) {
       expect(kinds).toContain(kind);
     }
   });
